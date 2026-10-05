@@ -215,56 +215,65 @@ export default function LandingPage({ onLoginClick }) {
         </div>
       </div>
 
-      {/* --- UPGRADED FEATURES GRID (With Pharmacy) --- */}
+      {/* --- UPGRADED FEATURES GRID (With OCR, Multi-Language & Proximity) --- */}
       <div id="features" className="bg-slate-950 py-16 sm:py-24 md:py-32 border-t border-slate-800 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 sm:mb-20">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold uppercase tracking-wider mb-3">
+              <span>✨ Version 2.0 Architectural Upgrades</span>
+            </div>
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-3 sm:mb-6">Everything your hospital needs.</h2>
-            <p className="text-slate-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">Stop using five different software tools. ArogyaNext unifies the patient journey with cutting-edge AI and seamless real-time syncing.</p>
+            <p className="text-slate-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">From paper prescription OCR scanning to multi-lingual voice triage, ArogyaNext unifies patients and clinicians in one frictionless loop.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
             
-            {/* Feature 1: AI Voice Booking */}
+            {/* Feature 1: On-Device Prescription OCR */}
+            <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl sm:rounded-3xl hover:border-indigo-500/50 transition-colors group">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">📷</div>
+              <div className="inline-block px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 text-[10px] font-black uppercase tracking-wider mb-2 border border-indigo-500/20">Google ML Kit</div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">On-Device Prescription OCR</h3>
+              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Patients take a photo of old paper prescriptions. Privacy-focused on-device text recognition instantly extracts doctor notes, previous medications, and reported symptoms directly for the doctor to review.</p>
+            </div>
+
+            {/* Feature 2: Multi-Language Voice AI */}
             <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl sm:rounded-3xl hover:border-blue-500/50 transition-colors group">
               <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">🎙️</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">AI Voice Booking</h3>
-              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Perfect for elderly patients. Just tap the microphone and speak. The AI instantly flags emergencies and pre-fills the booking.</p>
+              <div className="inline-block px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 text-[10px] font-black uppercase tracking-wider mb-2 border border-blue-500/20">6 Regional Languages</div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Multi-Language Voice AI</h3>
+              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Patients speak in English, Hindi (हिन्दी), Tamil (தமிழ்), Telugu (తెలుగు), Marathi (मराठी), or Bengali (বাংলা). High-accuracy speech recognition eliminates the digital divide for elderly and regional citizens.</p>
             </div>
 
-            {/* Feature 2: Smart Triage */}
+            {/* Feature 3: Visual & Audio AI Symptom Triage */}
             <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl sm:rounded-3xl hover:border-purple-500/50 transition-colors group">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-purple-500/10 text-purple-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">🤖</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Smart Symptom Triage</h3>
-              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Stop guessing which doctor to see. Patients select their symptoms, and our logic engine automatically routes them to the correct specialist.</p>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-purple-500/10 text-purple-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">🧠</div>
+              <div className="inline-block px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 text-[10px] font-black uppercase tracking-wider mb-2 border border-purple-500/20">Visual Body Map & Audio</div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Visual & Audio AI Triage</h3>
+              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Interactive body map regions (Head, Chest, Digestion, Limbs), universal emoji cards, color-coded pain scale, and Text-to-Speech audio guidance (`Listen 🔊`) ensure even illiterate patients select the right specialist.</p>
             </div>
 
-            {/* Feature 3: Voice TV Signage */}
+            {/* Feature 4: Live Queue Proximity Alerts */}
             <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl sm:rounded-3xl hover:border-emerald-500/50 transition-colors group">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">📺</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Voice-Enabled TV Signage</h3>
-              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Transform your lobby. Smart TVs display the live queue and use native Text-to-Speech to physically call out token numbers so patients never miss their turn.</p>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">🎟️</div>
+              <div className="inline-block px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 text-[10px] font-black uppercase tracking-wider mb-2 border border-emerald-500/20">0–4 Spots Away</div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Live Proximity Voice Alerts</h3>
+              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Patients receive live estimated wait times (~5 min per token) and automated voice proximity callouts when 4, 3, 2, 1, or 0 spots away with interactive check-in (`[ Proceed ]` / `[ Cancel ]`).</p>
             </div>
 
-            {/* Feature 4: Patient App */}
+            {/* Feature 5: Senior-Friendly Material 3 Design */}
             <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl sm:rounded-3xl hover:border-orange-500/50 transition-colors group">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-orange-500/10 text-orange-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">📱</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Patient Mobile App</h3>
-              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Patients book from home, view estimated wait times, and track their live queue status, instantly eliminating physical crowding in the waiting room.</p>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-orange-500/10 text-orange-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">👵</div>
+              <div className="inline-block px-2 py-0.5 rounded bg-orange-500/10 text-orange-300 text-[10px] font-black uppercase tracking-wider mb-2 border border-orange-500/20">Universal Accessibility</div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Senior-Friendly Patient UI</h3>
+              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Large high-contrast touch targets (≥48dp), rounded Material 3 cards, an interactive 4-step onboarding walkthrough, and instant 1-tap demo check-ins make the app effortless for all generations.</p>
             </div>
 
-            {/* Feature 5: Doctor Dashboard */}
+            {/* Feature 6: Voice-Enabled TV Signage & Analytics */}
             <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl sm:rounded-3xl hover:border-pink-500/50 transition-colors group">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-pink-500/10 text-pink-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">👨‍⚕️</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Frictionless Doctor Panel</h3>
-              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">A distraction-free interface for doctors to see who is up next, view pre-filled symptoms, and trigger the TV voice announcement with one click.</p>
-            </div>
-
-            {/* Feature 6: Director Analytics */}
-            <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl sm:rounded-3xl hover:border-indigo-500/50 transition-colors group">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">📊</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Director Analytics Hub</h3>
-              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Give hospital management a real-time, bird's-eye view of active doctors, patient load distribution, and critical ER cases across the facility.</p>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-pink-500/10 text-pink-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">📺</div>
+              <div className="inline-block px-2 py-0.5 rounded bg-pink-500/10 text-pink-300 text-[10px] font-black uppercase tracking-wider mb-2 border border-pink-500/20">Broadcast Displays</div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Smart TV Lobby Signage</h3>
+              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Smart TVs in hospital waiting rooms display neon live queues, continuous scrolling notice tickers, and spoken token announcements in real time as doctors click 'Call In'.</p>
             </div>
 
             {/* FEATURE 7: E-Pharmacy Sync */}
@@ -274,9 +283,9 @@ export default function LandingPage({ onLoginClick }) {
               <div className="w-16 h-16 sm:w-20 sm:h-20 bg-teal-500/10 text-teal-400 rounded-2xl sm:rounded-3xl flex items-center justify-center text-3xl sm:text-4xl flex-shrink-0 group-hover:scale-110 transition-transform shadow-[0_0_30px_rgba(20,184,166,0.2)]">💊</div>
               
               <div>
-                <div className="inline-block px-2.5 py-0.5 sm:px-3 sm:py-1 bg-teal-500/20 text-teal-300 text-[10px] sm:text-xs font-black tracking-widest uppercase rounded-md mb-2 sm:mb-3 border border-teal-500/30">New Feature</div>
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white mb-2 sm:mb-3">Instant E-Pharmacy Routing</h3>
-                <p className="text-slate-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-4xl">Doctors write digital prescriptions directly inside their dashboard. The moment the consultation ends, the medicine list is instantly beamed to your in-house pharmacy so medicine is ready before patient checkout.</p>
+                <div className="inline-block px-2.5 py-0.5 sm:px-3 sm:py-1 bg-teal-500/20 text-teal-300 text-[10px] sm:text-xs font-black tracking-widest uppercase rounded-md mb-2 sm:mb-3 border border-teal-500/30">Direct In-House Revenue</div>
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white mb-2 sm:mb-3">Instant E-Pharmacy Routing & OCR Sync</h3>
+                <p className="text-slate-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-4xl">Doctors review the patient's scanned paper prescription, generate a digital prescription, and with one click send the medicine order to the in-house pharmacy counter. Medicines are dispensed before the patient walks in.</p>
               </div>
             </div>
 
@@ -289,34 +298,34 @@ export default function LandingPage({ onLoginClick }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 sm:mb-20">
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-3 sm:mb-6">How ArogyaNext flows.</h2>
-            <p className="text-slate-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">A seamless loop from the patient's living room to the doctor's consultation desk.</p>
+            <p className="text-slate-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">From paper photo or voice input to the doctor's desk and hospital pharmacy.</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 relative">
             <div className="hidden md:block absolute top-12 left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-blue-900 via-blue-500/50 to-purple-900 z-0"></div>
 
             <div className="relative z-10 flex flex-col items-center text-center p-4 rounded-2xl bg-slate-950/40 md:bg-transparent border border-slate-800 md:border-none">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-950 border-4 border-slate-800 group-hover:border-blue-500 rounded-full flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-6 shadow-xl transition-colors">1️⃣</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Patient Books</h3>
-              <p className="text-slate-400 text-xs sm:text-sm">Patient books via the mobile app or voice assistant and receives a live digital token.</p>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-950 border-4 border-slate-800 group-hover:border-indigo-500 rounded-full flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-6 shadow-xl transition-colors">1️⃣</div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Scan & Voice Book</h3>
+              <p className="text-slate-400 text-xs sm:text-sm">Patient speaks in their native language or photographs an old prescription with ML Kit OCR.</p>
             </div>
 
             <div className="relative z-10 flex flex-col items-center text-center p-4 rounded-2xl bg-slate-950/40 md:bg-transparent border border-slate-800 md:border-none">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-950 border-4 border-slate-800 group-hover:border-blue-500 rounded-full flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-6 shadow-xl transition-colors">2️⃣</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Smart Queue</h3>
-              <p className="text-slate-400 text-xs sm:text-sm">Patient arrives just in time. The Waiting Room TV auto-syncs to show who is "Up Next".</p>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-950 border-4 border-slate-800 group-hover:border-purple-500 rounded-full flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-6 shadow-xl transition-colors">2️⃣</div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Visual AI Triage</h3>
+              <p className="text-slate-400 text-xs sm:text-sm">Universal body map and emoji pain scale match specialist. Live token queue is generated.</p>
             </div>
 
             <div className="relative z-10 flex flex-col items-center text-center p-4 rounded-2xl bg-slate-950/40 md:bg-transparent border border-slate-800 md:border-none">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-950 border-4 border-slate-800 group-hover:border-purple-500 rounded-full flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-6 shadow-xl transition-colors">3️⃣</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Doctor Calls</h3>
-              <p className="text-slate-400 text-xs sm:text-sm">Doctor clicks "Call Next". The TV visually updates and announces the token aloud.</p>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-950 border-4 border-slate-800 group-hover:border-blue-500 rounded-full flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-6 shadow-xl transition-colors">3️⃣</div>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Proximity Alert</h3>
+              <p className="text-slate-400 text-xs sm:text-sm">Phone speaks alert at 0–4 spots away. Waiting TV lobby announces token aloud.</p>
             </div>
 
             <div className="relative z-10 flex flex-col items-center text-center p-4 rounded-2xl bg-slate-950/40 md:bg-transparent border border-slate-800 md:border-none">
               <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-950 border-4 border-slate-800 group-hover:border-emerald-500 rounded-full flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-6 shadow-xl transition-colors">4️⃣</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Director Tracks</h3>
-              <p className="text-slate-400 text-xs sm:text-sm">Hospital Admin watches the entire ecosystem flow via the real-time analytics panel.</p>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Consult & Dispense</h3>
+              <p className="text-slate-400 text-xs sm:text-sm">Doctor checks scanned notes, e-signs prescription; hospital pharmacy packs medicines instantly.</p>
             </div>
           </div>
         </div>

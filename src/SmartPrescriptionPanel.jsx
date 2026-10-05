@@ -215,7 +215,14 @@ export default function SmartPrescriptionPanel({ hospitalId, doctorName }) {
                   <div key={patient.id} className={`bg-slate-900 p-3 sm:p-4 rounded-xl border-l-4 ${patient.isEmergency ? 'border-l-red-500' : 'border-l-blue-500'} flex justify-between items-center`}>
                     <div>
                       <p className="font-bold text-white text-sm sm:text-md">{patient.patientName}</p>
-                      <p className="text-xs text-slate-500">Token: <span className="font-bold text-slate-300">{patient.tokenNumber}</span></p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs text-slate-500">Token: <span className="font-bold text-slate-300">{patient.tokenNumber}</span></p>
+                        {patient.scannedPrescriptionText && (
+                          <span className="text-[9px] font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/30 px-1.5 py-0.5 rounded">
+                            📷 OCR Rx
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <button 
                       onClick={() => handleCallNext(patient)}
@@ -261,6 +268,27 @@ export default function SmartPrescriptionPanel({ hospitalId, doctorName }) {
                 Cancel Consultation
               </button>
             </div>
+
+            {/* 📷 SCANNED PAPER PRESCRIPTION (ML Kit OCR) */}
+            {currentPatient.scannedPrescriptionText && (
+              <div className="bg-slate-950 p-3 sm:p-4 rounded-2xl border border-indigo-500/40">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-indigo-400 flex items-center gap-1">
+                    <span>📷</span> Scanned Paper Rx (OCR)
+                  </span>
+                  <button 
+                    type="button" 
+                    onClick={() => setPrescriptionText(prev => prev.trim() ? `${prev}\n\n[Previous Rx]: ${currentPatient.scannedPrescriptionText}` : currentPatient.scannedPrescriptionText)}
+                    className="text-[10px] font-bold text-indigo-300 hover:text-white bg-indigo-600/30 hover:bg-indigo-600 px-2 py-0.5 rounded transition-colors"
+                  >
+                    + Insert
+                  </button>
+                </div>
+                <p className="text-xs text-slate-300 font-mono bg-slate-900 p-2.5 rounded-lg border border-slate-800 max-h-24 overflow-y-auto whitespace-pre-wrap leading-relaxed">
+                  {currentPatient.scannedPrescriptionText}
+                </p>
+              </div>
+            )}
 
             <div className="bg-slate-950 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-800 flex flex-col">
               <h3 className="text-white font-bold mb-3 flex items-center text-sm sm:text-base"><span className="mr-2">💊</span> Medicines</h3>

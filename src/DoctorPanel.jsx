@@ -79,6 +79,12 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
     }
   };
 
+  const handleAppendScannedNotes = () => {
+    if (!currentPatient?.scannedPrescriptionText) return;
+    const note = `[Previous Prescription Notes]:\n${currentPatient.scannedPrescriptionText}`;
+    setPrescriptionText(prev => prev.trim() ? `${prev}\n\n${note}` : note);
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 p-3 sm:p-6 md:p-8 flex flex-col lg:flex-row gap-6 text-slate-300 font-sans">
       
@@ -122,15 +128,22 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
           ) : (
             waitingPatients.map(patient => (
               <div key={patient.id} className={`bg-slate-900 p-3 sm:p-4 rounded-xl sm:rounded-2xl border-l-4 ${patient.isEmergency ? 'border-l-red-500 shadow-[0_0_15px_rgba(239,68,68,0.1)]' : 'border-l-blue-500'} flex justify-between items-center transition-all hover:bg-slate-800`}>
-                <div>
+                <div className="pr-2">
                   <p className="font-bold text-white text-sm sm:text-base">{patient.patientName}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">Token: <span className="font-bold text-blue-400">{patient.tokenNumber}</span></p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <p className="text-xs text-slate-500">Token: <span className="font-bold text-blue-400">{patient.tokenNumber}</span></p>
+                    {patient.scannedPrescriptionText && (
+                      <span className="text-[9px] font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/30 px-1.5 py-0.2 rounded">
+                        📷 OCR Rx
+                      </span>
+                    )}
+                  </div>
                   {patient.isEmergency && <p className="text-[9px] sm:text-[10px] text-red-500 font-black mt-1 uppercase tracking-widest animate-pulse">Emergency</p>}
                 </div>
                 <button 
                   disabled={currentPatient !== null}
                   onClick={() => handleCallNext(patient)}
-                  className={`px-3.5 sm:px-4 py-2 rounded-xl font-bold text-xs transition-all active:scale-95 ${currentPatient ? 'bg-slate-800 text-slate-600' : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20'}`}
+                  className={`px-3.5 sm:px-4 py-2 rounded-xl font-bold text-xs transition-all active:scale-95 flex-shrink-0 ${currentPatient ? 'bg-slate-800 text-slate-600' : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20'}`}
                 >
                   Call In
                 </button>
@@ -148,10 +161,11 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
 
         {currentPatient ? (
           <div className="flex-1 flex flex-col z-10">
-            <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6 sm:mb-8 bg-slate-950 p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-800 shadow-inner">
+            {/* Patient Header Card */}
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-5 sm:mb-6 bg-slate-950 p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-800 shadow-inner">
               <div>
                 <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1">Patient Name</p>
-                <h3 className="text-2xl sm:text-3xl font-black text-white mb-2 sm:mb-4">
+                <h3 className="text-2xl sm:text-3xl font-black text-white mb-2 sm:mb-3">
                   {currentPatient.patientName} <span className="text-sm font-medium text-slate-500">({currentPatient.patientAge} yrs)</span>
                 </h3>
                 <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1">Reported Symptoms</p>
@@ -161,12 +175,34 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
               </div>
               <div className="sm:text-right">
                 <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1">Live Token</p>
-                <p className="text-2xl sm:text-4xl font-black text-blue-500 bg-blue-500/10 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-blue-500/20 inline-block">
+                <p className="text-2xl sm:text-4xl font-black text-blue-500 bg-blue-500/10 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-blue-500/20 inline-block font-mono">
                   {currentPatient.tokenNumber}
                 </p>
               </div>
             </div>
 
+            {/* 📷 SCANNED PRESCRIPTION OCR CARD (From Patient Mobile App) */}
+            {currentPatient.scannedPrescriptionText && (
+              <div className="mb-5 sm:mb-6 p-4 rounded-2xl bg-indigo-950/40 border border-indigo-500/40 relative overflow-hidden">
+                <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
+                  <span className="text-xs font-bold uppercase tracking-widest text-indigo-300 flex items-center gap-1.5">
+                    <span>📷</span> On-Device OCR Scanned Paper Rx (ML Kit)
+                  </span>
+                  <button 
+                    type="button"
+                    onClick={handleAppendScannedNotes}
+                    className="text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 px-3 py-1.5 rounded-lg transition-all shadow-md active:scale-95 flex items-center gap-1"
+                  >
+                    <span>+</span> Insert into E-Prescription
+                  </button>
+                </div>
+                <div className="bg-slate-950/90 rounded-xl p-3 border border-indigo-950 text-xs sm:text-sm text-slate-300 font-mono whitespace-pre-wrap max-h-36 overflow-y-auto leading-relaxed">
+                  {currentPatient.scannedPrescriptionText}
+                </div>
+              </div>
+            )}
+
+            {/* E-Prescription Input */}
             <div className="flex-1 flex flex-col mb-6 sm:mb-8">
               <label className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-2 flex items-center">
                 <span className="mr-2">💊</span> Digital E-Prescription

@@ -234,7 +234,14 @@ export default function ReceptionistPanel({ hospitalId }) {
                                   <p className="font-bold text-slate-800 text-xs sm:text-sm">
                                     {patient.patientName} {patient.isEmergency && "🚨"}
                                   </p>
-                                  <p className="text-[10px] sm:text-xs text-slate-400">Token: {patient.tokenNumber}</p>
+                                  <div className="flex items-center gap-1.5 mt-0.5">
+                                    <p className="text-[10px] sm:text-xs text-slate-400">Token: {patient.tokenNumber}</p>
+                                    {patient.scannedPrescriptionText && (
+                                      <span className="text-[9px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-1 py-0.2 rounded">
+                                        📷 OCR Rx
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                               
