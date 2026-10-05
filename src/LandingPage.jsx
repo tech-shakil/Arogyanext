@@ -177,18 +177,18 @@ export default function LandingPage({ onLoginClick }) {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 md:pt-32 pb-16 sm:pb-28 md:pb-40 text-center overflow-hidden">
         
         {/* Glow Spheres with mobile boundaries */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[500px] md:w-[750px] h-[250px] sm:h-[350px] bg-blue-600/15 blur-[90px] sm:blur-[120px] rounded-full pointer-events-none"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[220px] sm:w-[350px] md:w-[450px] h-[200px] sm:h-[280px] bg-purple-600/15 blur-[80px] sm:blur-[100px] rounded-full pointer-events-none"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[500px] md:w-[750px] h-[250px] sm:h-[350px] bg-blue-600/20 blur-[90px] sm:blur-[120px] rounded-full pointer-events-none animate-pulse"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[220px] sm:w-[350px] md:w-[450px] h-[200px] sm:h-[280px] bg-purple-600/20 blur-[80px] sm:blur-[100px] rounded-full pointer-events-none animate-pulse"></div>
 
-        {/* Top Badge */}
-        <div className="inline-flex items-center max-w-full mb-4 sm:mb-6 px-3.5 sm:px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-400 text-xs sm:text-sm font-bold tracking-wide backdrop-blur-sm">
+        {/* Top Badge with Floating Animation */}
+        <div className="inline-flex items-center max-w-full mb-4 sm:mb-6 px-3.5 sm:px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-400 text-xs sm:text-sm font-bold tracking-wide backdrop-blur-sm animate-float shadow-lg shadow-blue-500/10">
           <span className="truncate">🚀 The Next Gen Hospital Management OS</span>
         </div>
         
-        {/* Responsive Heading */}
+        {/* Responsive Heading with Animated Gradient */}
         <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tight mb-4 sm:mb-8 leading-[1.12] sm:leading-tight relative z-10">
           Zero wait times. <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 animate-gradient">
             Infinite efficiency.
           </span>
         </h1>
