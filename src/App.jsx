@@ -156,42 +156,59 @@ export default function App() {
       <nav className="bg-slate-950 border-b border-slate-800 px-4 sm:px-6 py-3 sm:py-4 sticky top-0 z-50 print:hidden">
         <div className="flex items-center justify-between">
           
-          {/* Brand Logo & Hospital ID */}
           <div className="flex items-center space-x-3 sm:space-x-4">
-            <div className="text-lg sm:text-xl font-black tracking-wider text-white flex flex-col leading-tight">
-              <div>Arogya<span className="text-blue-500">Next</span></div>
-              <span className="text-[9px] sm:text-[10px] text-slate-500 tracking-widest uppercase truncate max-w-[130px] sm:max-w-none">
-                {userProfile.hospitalId}
-              </span>
+            {/* Brand Logo & Hospital ID */}
+            <div className="flex items-center gap-2.5 sm:gap-3.5">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center font-black text-white text-base shadow-md shadow-blue-500/30 ring-1 ring-white/20 select-none">
+                  ✚
+                </div>
+                <div className="text-lg sm:text-xl font-black tracking-wider text-white whitespace-nowrap">
+                  Arogya<span className="text-blue-400">Next</span>
+                </div>
+              </div>
+
+              {userProfile.hospitalId && (
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700/80 text-[11px] font-mono text-slate-200 shadow-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span className="hidden sm:inline text-slate-400 text-[10px] uppercase font-sans font-bold tracking-wider">HOSP:</span>
+                  <span className="text-blue-400 font-bold tracking-wider">{userProfile.hospitalId}</span>
+                </div>
+              )}
             </div>
 
-            {/* Desktop Navigation Tabs */}
-            <div className="hidden md:flex space-x-1.5 lg:space-x-2 ml-4">
-              {visibleTabs.map(tab => (
-                <button 
-                  key={tab.id}
-                  onClick={() => setCurrentView(tab.id)} 
-                  className={`px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg font-medium text-xs lg:text-sm transition-colors flex items-center gap-1.5 ${
-                    currentView === tab.id ? tab.activeClass : 'hover:bg-slate-800 text-slate-400'
-                  }`}
-                >
-                  <span>{tab.icon}</span>
-                  <span>{tab.label}</span>
-                </button>
-              ))}
-            </div>
+          {/* Desktop Navigation Tabs */}
+          <div className="hidden md:flex space-x-1.5 lg:space-x-2 ml-4">
+            {visibleTabs.map(tab => (
+              <button 
+                key={tab.id}
+                onClick={() => setCurrentView(tab.id)} 
+                className={`px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg font-medium text-xs lg:text-sm transition-colors flex items-center gap-1.5 ${
+                  currentView === tab.id ? tab.activeClass : 'hover:bg-slate-800 text-slate-400'
+                }`}
+              >
+                <span>{tab.icon}</span>
+                <span>{tab.label}</span>
+              </button>
+            ))}
           </div>
+        </div>
 
-          {/* User profile & Logout */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            <div className="hidden sm:flex flex-col text-right mr-1">
-              <span className="text-xs sm:text-sm font-bold text-white leading-none truncate max-w-[150px]">
+        {/* User profile & Logout */}
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="hidden sm:flex items-center gap-2.5 mr-2 pl-3 border-l border-slate-800">
+            <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-blue-400 ring-1 ring-blue-500/20">
+              {(userProfile.fullName || user.email || 'U')[0].toUpperCase()}
+            </div>
+            <div className="flex flex-col text-left">
+              <span className="text-xs font-bold text-white leading-tight truncate max-w-[140px]">
                 {userProfile.fullName || user.email}
               </span>
-              <span className="text-[9px] sm:text-[10px] font-black text-blue-400 uppercase tracking-widest mt-1">
+              <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">
                 {userProfile.role}
               </span>
             </div>
+          </div>
 
             <button 
               onClick={handleLogout} 

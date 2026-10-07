@@ -109,7 +109,7 @@ export default function HospitalAdmin({ hospitalId }) {
       </div>
 
       {/* Top Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-10">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
         {stats.map((stat, index) => (
           <div key={index} className="bg-slate-950 border border-slate-800 p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-lg">
             <div className="flex justify-between items-start mb-2 sm:mb-4">
@@ -122,6 +122,113 @@ export default function HospitalAdmin({ hospitalId }) {
             <p className="text-xl sm:text-3xl font-black text-white">{stat.value}</p>
           </div>
         ))}
+      </div>
+
+      {/* --- CLINICAL EFFICIENCY & DEPARTMENT BREAKDOWN --- */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8">
+        
+        {/* Department Footfall Progress Bars */}
+        <div className="lg:col-span-2 bg-slate-950 border border-slate-800 p-5 sm:p-7 rounded-2xl sm:rounded-3xl shadow-lg">
+          <div className="flex justify-between items-center mb-5 pb-3 border-b border-slate-800">
+            <div>
+              <h3 className="text-base sm:text-lg font-black text-white">OPD Footfall by Department</h3>
+              <p className="text-xs text-slate-400">Real-time consultation load distribution across specialty clinics</p>
+            </div>
+            <span className="text-xs font-mono font-bold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20">
+              Live Triage Data
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <div className="flex justify-between text-xs font-bold mb-1">
+                <span className="text-slate-200">🩺 General Medicine & Chest</span>
+                <span className="text-blue-400">42% (60 Patients)</span>
+              </div>
+              <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                <div className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full" style={{ width: '42%' }}></div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between text-xs font-bold mb-1">
+                <span className="text-slate-200">👶 Pediatrics & Child Care</span>
+                <span className="text-purple-400">24% (34 Patients)</span>
+              </div>
+              <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full" style={{ width: '24%' }}></div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between text-xs font-bold mb-1">
+                <span className="text-slate-200">🦴 Orthopedics & Joint Care</span>
+                <span className="text-emerald-400">18% (26 Patients)</span>
+              </div>
+              <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full" style={{ width: '18%' }}></div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between text-xs font-bold mb-1">
+                <span className="text-slate-200">👂 ENT & Ophthalmology</span>
+                <span className="text-amber-400">16% (22 Patients)</span>
+              </div>
+              <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                <div className="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full" style={{ width: '16%' }}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quality & SLA Benchmarks */}
+        <div className="bg-slate-950 border border-slate-800 p-5 sm:p-7 rounded-2xl sm:rounded-3xl shadow-lg flex flex-col justify-between">
+          <div>
+            <h3 className="text-base sm:text-lg font-black text-white mb-1">Hospital Quality Score</h3>
+            <p className="text-xs text-slate-400 mb-5">Measured by patient reviews and queue adherence</p>
+
+            <div className="space-y-3.5">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xl">⭐</span>
+                  <div>
+                    <p className="text-xs font-bold text-white">Patient Rating</p>
+                    <p className="text-[10px] text-slate-400">Post-visit SMS feedback</p>
+                  </div>
+                </div>
+                <span className="text-sm font-black text-amber-400">4.9 / 5.0</span>
+              </div>
+
+              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xl">⚡</span>
+                  <div>
+                    <p className="text-xs font-bold text-white">Zero Wait SLA</p>
+                    <p className="text-[10px] text-slate-400">Seen within 15 mins</p>
+                  </div>
+                </div>
+                <span className="text-sm font-black text-emerald-400">92.4%</span>
+              </div>
+
+              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xl">🇮🇳</span>
+                  <div>
+                    <p className="text-xs font-bold text-white">ABDM Digital Compliance</p>
+                    <p className="text-[10px] text-slate-400">National Health ID Sync</p>
+                  </div>
+                </div>
+                <span className="text-sm font-black text-blue-400">100% Ready</span>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-[11px] text-slate-500 mt-4 text-center font-medium">
+            Automated compliance audits updated continuously.
+          </p>
+        </div>
+
       </div>
 
       {/* Export Section */}

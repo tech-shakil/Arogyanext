@@ -291,13 +291,33 @@ export default function SmartPrescriptionPanel({ hospitalId, doctorName }) {
             )}
 
             <div className="bg-slate-950 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-800 flex flex-col">
-              <h3 className="text-white font-bold mb-3 flex items-center text-sm sm:text-base"><span className="mr-2">💊</span> Medicines</h3>
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-white font-bold flex items-center text-sm sm:text-base"><span className="mr-2">💊</span> Prescription & Medicines</h3>
+                {prescriptionText && (
+                  <button onClick={() => setPrescriptionText("")} className="text-[11px] text-slate-500 hover:text-red-400">Clear</button>
+                )}
+              </div>
+
+              {/* 1-Tap Med Chips */}
+              <div className="flex flex-wrap gap-1 mb-2.5">
+                {["Tab. Paracetamol 650mg (1-0-1 PC)", "Cap. Amoxicillin 500mg (1-1-1 PC)", "Tab. Pantoprazole 40mg (1-0-0 AC)", "Tab. Cetirizine 10mg (0-0-1 HS)", "ORS Sachet (SOS)"].map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => setPrescriptionText(prev => prev.trim() ? `${prev}\n• ${m}` : `• ${m}`)}
+                    className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-900 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-700 transition-colors"
+                  >
+                    + {m.split(' ')[1]}
+                  </button>
+                ))}
+              </div>
+
               <textarea 
                 value={prescriptionText}
                 onChange={(e) => setPrescriptionText(e.target.value)}
                 rows={4}
-                placeholder="Type medicines here..."
-                className="w-full bg-slate-900 text-white border border-slate-700 rounded-xl p-3 sm:p-4 resize-y text-xs sm:text-sm focus:border-blue-500 outline-none"
+                placeholder="Type medicines or click 1-tap chips above..."
+                className="w-full bg-slate-900 text-white border border-slate-700 rounded-xl p-3 sm:p-4 resize-y text-xs sm:text-sm focus:border-blue-500 outline-none font-mono"
               />
             </div>
 

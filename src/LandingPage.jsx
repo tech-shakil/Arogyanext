@@ -11,6 +11,33 @@ export default function LandingPage({ onLoginClick }) {
   const [userName, setUserName] = useState('Md Shakil Akhtar');
   const [email, setEmail] = useState('');
 
+  // --- INTERACTIVE PLAYGROUND STATES ---
+  const [activePlaygroundTab, setActivePlaygroundTab] = useState('ocr');
+  const [testLanguage, setTestLanguage] = useState('Hindi');
+  const [testSpotsAway, setTestSpotsAway] = useState(2);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+
+  const sampleLanguages = [
+    { name: 'English', native: 'English', text: 'Doctor, I have a persistent dry cough and slight fever for 3 days.', voice: 'Doctor, I have a persistent dry cough and slight fever for 3 days.' },
+    { name: 'Hindi', native: 'हिन्दी', text: 'डॉक्टर साहब, मुझे 3 दिनों से तेज़ बुखार और सिरदर्द है।', voice: 'Doctor sahab, mujhe teen dinon se tez bukhar aur sirdard hai.' },
+    { name: 'Tamil', native: 'தமிழ்', text: 'மருத்துவரே, எனக்கு மூன்று நாட்களாக கடுமையான தலைவலி உள்ளது.', voice: 'Maruthuvare, enakku moondru naatkalaga kadumaiyana thalaivali ulladhu.' },
+    { name: 'Telugu', native: 'తెలుగు', text: 'డాక్టర్ గారు, నాకు మూడు రోజులుగా జ్వరం మరియు దగ్గు ఉంది.', voice: 'Doctor gaaru, naaku moodu rojula gaa jvaram mariyu daggu undhi.' },
+    { name: 'Marathi', native: 'मराठी', text: 'डॉक्टर, मला तीन दिवसांपासून खूप ताप आणि खोकला आहे.', voice: 'Doctor, mala teen divasanpasun khoop taap aani khokla aahe.' },
+    { name: 'Bengali', native: 'বাংলা', text: 'ডাক্তারবাবু, আমার তিন দিন ধরে জ্বর এবং কাশি হচ্ছে।', voice: 'Doctorbabu, amar teen din dhore jwor ebong kashi hochhe.' },
+  ];
+
+  const handleTestSpeech = (text) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9;
+      setIsPlayingAudio(true);
+      utterance.onend = () => setIsPlayingAudio(false);
+      utterance.onerror = () => setIsPlayingAudio(false);
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   // Smooth scroll function for the navigation links
   const scrollToSection = (id) => {
     setMobileMenuOpen(false);
@@ -207,11 +234,207 @@ export default function LandingPage({ onLoginClick }) {
             Start Free Trial
           </button>
           <button 
-            onClick={() => scrollToSection('features')}
-            className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg border border-slate-700 hover:border-slate-500 text-white bg-slate-800/50 backdrop-blur-md transition-all active:scale-95"
+            onClick={() => scrollToSection('simulator')}
+            className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg border border-slate-700 hover:border-slate-500 text-white bg-slate-800/50 backdrop-blur-md transition-all active:scale-95 flex items-center justify-center gap-2"
           >
-            Explore Features
+            <span>🎮 Try Live Simulator</span>
           </button>
+        </div>
+
+        {/* --- TRUST & IMPACT METRICS RIBBON --- */}
+        <div className="mt-12 sm:mt-16 pt-8 border-t border-slate-800/80 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto relative z-10">
+          <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+            <p className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">85%</p>
+            <p className="text-[11px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Wait Time Cut</p>
+          </div>
+          <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+            <p className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">&lt;50ms</p>
+            <p className="text-[11px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Cloud Sync</p>
+          </div>
+          <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+            <p className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">6 Lang</p>
+            <p className="text-[11px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Voice Triage</p>
+          </div>
+          <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+            <p className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">100%</p>
+            <p className="text-[11px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider mt-0.5">On-Device OCR</p>
+          </div>
+        </div>
+      </div>
+
+      {/* --- INTERACTIVE LIVE FEATURE SIMULATOR --- */}
+      <div id="simulator" className="py-12 sm:py-16 bg-slate-950/80 border-t border-slate-800 relative scroll-mt-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-2">
+              <span>⚡ Hands-on Preview</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-black text-white">Experience ArogyaNext In Action</h2>
+            <p className="text-slate-400 text-xs sm:text-sm mt-1 max-w-xl mx-auto">Interact with the core modules below to see how speech triage, OCR parsing, and proximity countdown alerts work in real time.</p>
+          </div>
+
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl relative overflow-hidden">
+            {/* Simulator Tabs */}
+            <div className="flex border-b border-slate-800 pb-4 mb-6 gap-2 overflow-x-auto no-scrollbar">
+              <button 
+                onClick={() => setActivePlaygroundTab('ocr')}
+                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
+                  activePlaygroundTab === 'ocr' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'bg-slate-800/70 text-slate-400 hover:text-white'
+                }`}
+              >
+                <span>📷</span>
+                <span>On-Device ML Kit OCR</span>
+              </button>
+              <button 
+                onClick={() => setActivePlaygroundTab('voice')}
+                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
+                  activePlaygroundTab === 'voice' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'bg-slate-800/70 text-slate-400 hover:text-white'
+                }`}
+              >
+                <span>🎙️</span>
+                <span>6-Language Voice AI</span>
+              </button>
+              <button 
+                onClick={() => setActivePlaygroundTab('proximity')}
+                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
+                  activePlaygroundTab === 'proximity' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30' : 'bg-slate-800/70 text-slate-400 hover:text-white'
+                }`}
+              >
+                <span>🎟️</span>
+                <span>Proximity Voice Countdown</span>
+              </button>
+            </div>
+
+            {/* TAB 1: OCR SIMULATOR */}
+            {activePlaygroundTab === 'ocr' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <div className="bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-800">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Patient Camera Capture</span>
+                    <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-bold border border-emerald-500/20">Edge ML Processed</span>
+                  </div>
+                  <div className="border-2 border-dashed border-indigo-500/40 rounded-xl p-4 bg-indigo-950/20 flex flex-col items-center justify-center text-center">
+                    <span className="text-4xl mb-2">📄</span>
+                    <p className="font-bold text-white text-sm">Sample Paper Slip #Rx-8921</p>
+                    <p className="text-[11px] text-slate-400 mt-1">Simulated camera input • Privacy protected</p>
+                  </div>
+                </div>
+
+                <div className="bg-slate-950 p-4 sm:p-5 rounded-2xl border border-indigo-500/30 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <span>✨</span> Extracted Digital Text
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono">0.12s latency</span>
+                    </div>
+                    <div className="bg-slate-900 rounded-xl p-3 font-mono text-xs text-slate-200 border border-slate-800 whitespace-pre-wrap leading-relaxed">
+                      {"[Prior Prescription Notes]:\n1. Tab. Dolo 650mg - 1x BD (3 Days)\n2. Cap. Amoxicillin 500mg - 1x TDS\n3. Syrup Ascoril LS - 5ml at bedtime\nDiagnosis: Acute bronchitis with mild fever"}
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-3 flex items-center gap-1.5">
+                    <span className="text-emerald-400">✓</span> Auto-syncs directly to attending doctor's cabin screen
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: MULTI-LANGUAGE VOICE SIMULATOR */}
+            {activePlaygroundTab === 'voice' && (
+              <div className="space-y-4">
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Select a regional Indian language to hear live voice triage:</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                  {sampleLanguages.map((lang) => (
+                    <button
+                      key={lang.name}
+                      onClick={() => setTestLanguage(lang.name)}
+                      className={`p-2.5 rounded-xl text-left border transition-all ${
+                        testLanguage === lang.name 
+                          ? 'bg-blue-600/20 border-blue-500 text-white shadow-md shadow-blue-500/10' 
+                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <p className="text-xs font-bold">{lang.native}</p>
+                      <p className="text-[10px] text-slate-500">{lang.name}</p>
+                    </button>
+                  ))}
+                </div>
+
+                {(() => {
+                  const currentSample = sampleLanguages.find(l => l.name === testLanguage) || sampleLanguages[0];
+                  return (
+                    <div className="bg-slate-950 p-4 sm:p-5 rounded-2xl border border-blue-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400">Recognized Patient Speech:</span>
+                        <p className="text-base sm:text-lg font-bold text-white mt-1 leading-snug">"{currentSample.text}"</p>
+                        <p className="text-xs text-slate-400 mt-1">Mapped Specialist: <span className="text-emerald-400 font-bold">General Medicine / Pulmonology</span></p>
+                      </div>
+                      <button
+                        onClick={() => handleTestSpeech(currentSample.voice)}
+                        className={`px-5 py-3 rounded-xl font-bold text-xs sm:text-sm text-white flex items-center gap-2 flex-shrink-0 transition-all ${
+                          isPlayingAudio ? 'bg-amber-600 animate-pulse' : 'bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-600/20 active:scale-95'
+                        }`}
+                      >
+                        <span>🔊</span>
+                        <span>{isPlayingAudio ? 'Speaking...' : 'Play Audio Voice'}</span>
+                      </button>
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+
+            {/* TAB 3: PROXIMITY SIMULATOR */}
+            {activePlaygroundTab === 'proximity' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <div className="bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-800">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">
+                    Simulate Patients Ahead: <span className="text-emerald-400 font-mono text-base font-black">{testSpotsAway}</span>
+                  </label>
+                  <input 
+                    type="range" min="0" max="4" value={testSpotsAway} 
+                    onChange={(e) => setTestSpotsAway(parseInt(e.target.value))} 
+                    className="w-full accent-emerald-500 cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-500 mt-2 font-mono">
+                    <span>0 (Your Turn!)</span>
+                    <span>1 spot</span>
+                    <span>2 spots</span>
+                    <span>3 spots</span>
+                    <span>4 spots</span>
+                  </div>
+                </div>
+
+                <div className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+                  testSpotsAway === 0 
+                    ? 'bg-emerald-950/40 border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.25)]' 
+                    : 'bg-slate-950 border-slate-800'
+                }`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">Smartphone Alert Preview</span>
+                    <span className="text-[10px] text-slate-400 font-mono">Est. Wait: ~{testSpotsAway * 5} mins</span>
+                  </div>
+                  <h4 className="text-lg font-black text-white">
+                    {testSpotsAway === 0 ? '🚨 Please Step into Doctor Cabin 1!' : `⏳ Token S-14: You are ${testSpotsAway} spot${testSpotsAway > 1 ? 's' : ''} away.`}
+                  </h4>
+                  <p className="text-xs text-slate-300 mt-1">
+                    {testSpotsAway === 0 
+                      ? 'Doctor is ready. Proceed directly to the examination desk.' 
+                      : 'Please make your way toward the waiting lobby.'}
+                  </p>
+                  <div className="mt-3 flex gap-2">
+                    <button 
+                      onClick={() => handleTestSpeech(testSpotsAway === 0 ? "Token number S 14, please step into Cabin 1 now." : `Token S 14, you are ${testSpotsAway} spots away. Please head towards the lobby.`)}
+                      className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors flex items-center gap-1.5"
+                    >
+                      <span>🔊</span>
+                      <span>Speak Alert</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

@@ -6,7 +6,30 @@ export default function TVDisplay({ hospitalId }) {
   const [appointments, setAppointments] = useState([]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [lastAnnounced, setLastAnnounced] = useState(null);
+  const [isMuted, setIsMuted] = useState(false);
   const announcedTokens = useRef(new Set());
+
+  // Web Audio API Hospital Chime
+  const playClinicChime = () => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(659.25, ctx.currentTime); // E5
+      osc.frequency.setValueAtTime(880.00, ctx.currentTime + 0.15); // A5
+      gain.gain.setValueAtTime(0.25, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.6);
+    } catch (e) {
+      console.log("Audio chime error:", e);
+    }
+  };
 
   // Live Clock
   useEffect(() => {
@@ -45,18 +68,29 @@ export default function TVDisplay({ hospitalId }) {
   const announceToken = (token, doctor, patientName) => {
     setLastAnnounced({ token, doctor, patientName, timestamp: Date.now() });
 
-    if ('speechSynthesis' in window) {
-      const msg = new SpeechSynthesisUtterance();
-      msg.text = `Token number ${token.replace('-', ' ')}, please proceed to ${doctor}'s cabin.`;
-      msg.rate = 0.85; 
-      msg.pitch = 1;
-      window.speechSynthesis.speak(msg);
+    if (!isMuted) {
+      playClinicChime();
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        setTimeout(() => {
+          const msg = new SpeechSynthesisUtterance();
+          msg.text = `Token number ${token.replace('-', ' ')}, please proceed to ${doctor}'s cabin.`;
+          msg.rate = 0.85; 
+          msg.pitch = 1;
+          window.speechSynthesis.speak(msg);
+        }, 300);
+      }
     }
 
     // Auto-dismiss the visual announcement banner after 7 seconds
     setTimeout(() => {
       setLastAnnounced((prev) => (prev && prev.token === token ? null : prev));
     }, 7000);
+  };
+
+  const handleTestAnnouncement = () => {
+    announceToken("S-14", "Dr. Sharma", "Demo Patient");
   };
 
   // Group by Doctor
@@ -108,7 +142,7 @@ export default function TVDisplay({ hospitalId }) {
       )}
 
       {/* --- HEADER --- */}
-      <div className="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-8 py-3 sm:py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-2xl z-10">
+      <div className="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-8 py-3 sm:py-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 shadow-2xl z-10">
         <div className="flex items-center">
           <div className="w-11 h-11 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-600/30 to-purple-600/20 rounded-xl sm:rounded-2xl flex items-center justify-center text-2xl sm:text-3xl mr-3 sm:mr-4 border border-blue-500/40 shadow-inner">
             🏥
@@ -129,17 +163,41 @@ export default function TVDisplay({ hospitalId }) {
           </div>
         </div>
 
-        {/* Digital Clock with Blinking Colon */}
-        <div className="text-left sm:text-right">
-          <p className="text-3xl sm:text-5xl font-black font-mono tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400">
-            {hours}
-            <span className={`transition-opacity duration-200 ${colonVisible ? 'opacity-100 text-blue-400' : 'opacity-20 text-slate-600'}`}>:</span>
-            {minutes}
-            <span className="text-xs sm:text-sm font-sans font-bold text-slate-400 ml-1.5 uppercase">{ampm}</span>
-          </p>
-          <p className="text-slate-400 font-bold uppercase tracking-widest text-[9px] sm:text-xs mt-0.5 sm:mt-1">
-            {currentTime.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })}
-          </p>
+        {/* Audio Controls & Digital Clock */}
+        <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+          {/* Quick Audio Controls for Clinic Staff */}
+          <div className="flex items-center gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+            <button
+              onClick={() => setIsMuted(!isMuted)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                isMuted 
+                  ? 'bg-red-500/20 text-red-400 border border-red-500/30' 
+                  : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+              }`}
+            >
+              <span>{isMuted ? '🔇 Muted' : '🔊 Audio Active'}</span>
+            </button>
+            <button
+              onClick={handleTestAnnouncement}
+              className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 transition-colors active:scale-95 flex items-center gap-1"
+              title="Test audio speakers"
+            >
+              <span>🔔 Test Chime</span>
+            </button>
+          </div>
+
+          {/* Digital Clock with Blinking Colon */}
+          <div className="text-right">
+            <p className="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400">
+              {hours}
+              <span className={`transition-opacity duration-200 ${colonVisible ? 'opacity-100 text-blue-400' : 'opacity-20 text-slate-600'}`}>:</span>
+              {minutes}
+              <span className="text-xs sm:text-sm font-sans font-bold text-slate-400 ml-1.5 uppercase">{ampm}</span>
+            </p>
+            <p className="text-slate-400 font-bold uppercase tracking-widest text-[9px] sm:text-xs mt-0.5">
+              {currentTime.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -271,19 +329,21 @@ export default function TVDisplay({ hospitalId }) {
       {/* --- LIVE MARQUEE BROADCAST TICKER --- */}
       <div className="bg-slate-900 border-t border-slate-800 py-2.5 px-4 overflow-hidden relative z-20 flex items-center shadow-2xl">
         <div className="flex items-center bg-blue-600 text-white font-black text-[10px] sm:text-xs uppercase px-2.5 py-1 rounded-md tracking-wider mr-3 flex-shrink-0 shadow-sm">
-          <span>NOTICE</span>
+          <span>LIVE NOTICE</span>
         </div>
         <div className="overflow-hidden whitespace-nowrap flex-1">
           <div className="animate-marquee font-medium text-xs sm:text-sm text-slate-300 space-x-12">
-            <span>📢 Welcome to ArogyaNext Smart Health System</span>
+            <span>📢 Welcome to ArogyaNext Smart Clinic</span>
             <span>•</span>
-            <span>Tokens are called aloud with digital voice announcements</span>
+            <span>टोकन की आवाज़ सुनकर डॉक्टर केबिन में प्रवेश करें (Hindi)</span>
             <span>•</span>
-            <span>Please proceed directly to the doctor's cabin when your token is called</span>
+            <span>உங்கள் டோக்கன் அழைப்பைக் கேட்டு மருத்துவ அறைக்குச் செல்லவும் (Tamil)</span>
             <span>•</span>
-            <span>Emergency and urgent care cases are prioritized automatically</span>
+            <span>Emergency & urgent care cases are prioritized automatically</span>
             <span>•</span>
-            <span>Thank you for your patience and cooperation</span>
+            <span>Kindly maintain silence in the consultation lobby</span>
+            <span>•</span>
+            <span>Free prescription fulfillment available at In-House Pharmacy Counter</span>
           </div>
         </div>
       </div>

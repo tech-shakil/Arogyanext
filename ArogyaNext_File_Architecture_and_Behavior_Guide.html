@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ArogyaNext - Comprehensive Codebase Architecture & File Reference Guide</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 14mm 14mm 14mm 14mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #ffffff;
+      color: #1e293b;
+      line-height: 1.5;
+      font-size: 9.5pt;
+    }
+
+    /* Page container */
+    .page {
+      padding: 0;
+      margin-bottom: 20px;
+    }
+
+    .page-break {
+      page-break-after: always;
+      break-after: page;
+    }
+
+    .avoid-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Header & Footer in Document */
+    .doc-header {
+      border-bottom: 2px solid #2563eb;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .doc-title-main {
+      font-size: 18pt;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+    }
+
+    .doc-title-main span {
+      color: #2563eb;
+    }
+
+    .doc-meta {
+      font-size: 8pt;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Cover Page / Hero */
+    .cover-card {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      color: #ffffff;
+      padding: 28px 24px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
+
+    .cover-badge {
+      display: inline-block;
+      background: rgba(37, 99, 235, 0.3);
+      border: 1px solid rgba(96, 165, 250, 0.4);
+      color: #93c5fd;
+      font-size: 7.5pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      margin-bottom: 12px;
+    }
+
+    .cover-heading {
+      font-size: 22pt;
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+
+    .cover-subheading {
+      font-size: 10.5pt;
+      color: #cbd5e1;
+      max-width: 90%;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .cover-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 14pt;
+      font-weight: 900;
+      color: #60a5fa;
+    }
+
+    .stat-lbl {
+      font-size: 7pt;
+      color: #94a3b8;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Section Headings */
+    .section-title {
+      font-size: 13pt;
+      font-weight: 900;
+      color: #0f172a;
+      border-left: 4px solid #2563eb;
+      padding-left: 8px;
+      margin: 18px 0 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-desc {
+      font-size: 9pt;
+      color: #475569;
+      margin-bottom: 12px;
+    }
+
+    /* Cards */
+    .file-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      break-inside: avoid;
+    }
+
+    .file-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+
+    .file-name {
+      font-size: 11pt;
+      font-weight: 800;
+      color: #0f172a;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .file-pill {
+      font-size: 7pt;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .pill-core { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+    .pill-ui { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+    .pill-feature { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .pill-config { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .pill-style { background: #fce7f3; color: #9d174d; border: 1px solid #fbcfe8; }
+    .pill-admin { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 12px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      font-size: 8pt;
+    }
+
+    .meta-row {
+      display: flex;
+      gap: 4px;
+    }
+
+    .meta-key {
+      font-weight: 700;
+      color: #64748b;
+      min-width: 80px;
+    }
+
+    .meta-val {
+      color: #0f172a;
+      font-weight: 500;
+    }
+
+    .content-box {
+      margin-bottom: 8px;
+    }
+
+    .box-title {
+      font-size: 8pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #334155;
+      margin-bottom: 3px;
+    }
+
+    .box-text {
+      font-size: 8.5pt;
+      color: #334155;
+      line-height: 1.45;
+    }
+
+    .bullet-list {
+      margin-left: 16px;
+      margin-top: 3px;
+      font-size: 8.5pt;
+      color: #334155;
+    }
+
+    .bullet-list li {
+      margin-bottom: 2.5px;
+      line-height: 1.35;
+    }
+
+    .badge-tag {
+      display: inline-block;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      background: #e2e8f0;
+      color: #1e293b;
+      font-size: 7.5pt;
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    /* Tables */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 16px 0;
+      font-size: 8pt;
+    }
+
+    table.data-table th, table.data-table td {
+      border: 1px solid #cbd5e1;
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    table.data-table th {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 7.5pt;
+      letter-spacing: 0.5px;
+    }
+
+    table.data-table tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    /* Callouts */
+    .callout {
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin: 10px 0;
+      font-size: 8.5pt;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      break-inside: avoid;
+    }
+
+    .callout-blue {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      color: #1e40af;
+    }
+
+    .callout-purple {
+      background: #faf5ff;
+      border-left: 4px solid #a855f7;
+      color: #6b21a8;
+    }
+
+    .callout-green {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      color: #15803d;
+    }
+
+    .callout-amber {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #b45309;
+    }
+
+    .callout-icon {
+      font-size: 11pt;
+      line-height: 1;
+    }
+
+    /* Diagram Block */
+    .flow-diagram {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 7.5pt;
+      line-height: 1.45;
+      margin: 10px 0 16px 0;
+      border: 1px solid #334155;
+      white-space: pre;
+      overflow-x: auto;
+      break-inside: avoid;
+    }
+
+    .footer-bar {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 6px;
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      color: #94a3b8;
+      font-size: 7.5pt;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== PAGE 1: TITLE & ARCHITECTURE OVERVIEW ==================== -->
+  <div class="page">
+    <div class="doc-header">
+      <div class="doc-title-main">Arogya<span>Next</span> AI</div>
+      <div class="doc-meta">Comprehensive Codebase Architecture & File Reference Guide</div>
+    </div>
+
+    <div class="cover-card">
+      <div class="cover-badge">System Documentation & Code Reference v2.0</div>
+      <h1 class="cover-heading">ArogyaNext Admin & Clinical OS</h1>
+      <p class="cover-subheading">
+        Complete file-by-file specification of all source modules, data models, state workflows, 
+        Firebase Firestore schemas, real-time sync mechanisms, and user interactions.
+      </p>
+      <div class="cover-stats">
+        <div class="stat-item">
+          <div class="stat-num">22+</div>
+          <div class="stat-lbl">Source Files</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">7</div>
+          <div class="stat-lbl">Specialized Panels</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">5</div>
+          <div class="stat-lbl">Role Personas</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">Real-Time</div>
+          <div class="stat-lbl">Firestore Sync</div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">1. High-Level System Architecture & Cross-Panel Data Flow</h2>
+    <p class="section-desc">
+      ArogyaNext is built as a multi-tenant cloud hospital operating system using <strong>React 19</strong>, 
+      <strong>Vite 8</strong>, <strong>Tailwind CSS 4</strong>, and <strong>Firebase Firestore / Auth</strong>. 
+      Every clinical workflow connects without manual paper handoffs.
+    </p>
+
+    <div class="flow-diagram">
++--------------------------------------------------------------------------------------------------+
+|                                    AROGYANEXT CLINICAL PIPELINE                                   |
++--------------------------------------------------------------------------------------------------+
+                                                                                                    
+ [Patient Voice / Receptionist]                                                                     
+          |                                                                                        
+          v                                                                                        
+  appointments collection                                                                          
+  (status: "Waiting", tokenNumber: "S-14" / "E-99", hospitalId, doctorName)                         
+          |                                                                                        
+          +-----------------------+----------------------------------+                             
+          |                       |                                  |                             
+          v                       v                                  v                             
+  [Doctor Workspace]      [Smart Prescription Pad]          [TV Waiting Room Display]              
+  - View waiting queue    - Blank letterhead overlay        - Soundwave TTS Audio Callout          
+  - Review OCR paper Rx   - Stylus digital signature        - Real-time Neon queue board           
+  - Digital prescription  - Auto-print to hardware printer  - Continuous Marquee ticker            
+          |                       |                                                                
+          +-----------+-----------+                                                                
+                      |                                                                            
+                      v                                                                            
+         (status: "Completed", pharmacyStatus: "Pending", prescription: "Dolo 650mg...")            
+                      |                                                                            
+                      v                                                                            
+             [E-Pharmacy Hub] ------------------------> [Hospital Admin Analytics]                 
+             - Instant medicine alert                   - CSV Audit Reports (Day/Week/Month/Year)  
+             - 1-click Dispensed action                 - Footfall & Wait-time metrics             
+    </div>
+
+    <h2 class="section-title">2. Firebase Firestore Database Collections & Schema Design</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Collection</th>
+          <th>Document ID Key</th>
+          <th>Key Fields & Types</th>
+          <th>Panel Usage & Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>users</strong></td>
+          <td><code>auth.uid</code></td>
+          <td><code>uid, email, fullName, role, hospitalId, createdAt</code></td>
+          <td>Auth & profile management. Controls tab visibility and multi-tenant scoping.</td>
+        </tr>
+        <tr>
+          <td><strong>hospitals</strong></td>
+          <td><code>hospitalId</code> (e.g. HOSP_X92K)</td>
+          <td><code>hospitalId, hospitalName, createdAt</code></td>
+          <td>Workspace tenancy master table. Super Admin creates/manages hospital tenants.</td>
+        </tr>
+        <tr>
+          <td><strong>doctors</strong></td>
+          <td><code>doctor.uid</code></td>
+          <td><code>name, hospitalId, specialty, isActive</code></td>
+          <td>Active medical staff directory used by Receptionist to assign incoming patients.</td>
+        </tr>
+        <tr>
+          <td><strong>appointments</strong></td>
+          <td>Auto-generated UUID</td>
+          <td><code>tokenNumber, patientName, patientAge, symptoms, doctorName, hospitalId, status, isEmergency, appointmentDate, timeSlot, timestamp, prescription, pharmacyStatus, scannedPrescriptionText</code></td>
+          <td>Heart of the application. Tracks the end-to-end lifecycle of patient consultations and medicine fulfillment.</td>
+        </tr>
+        <tr>
+          <td><strong>doctor_status</strong></td>
+          <td><code>doctorName</code></td>
+          <td><code>status ('Active'|'Away'|'In Consultation'), currentToken, lastUpdated</code></td>
+          <td>Global availability indicator for doctors, allowing reception and patients to see doctor availability.</td>
+        </tr>
+        <tr>
+          <td><strong>queue</strong></td>
+          <td><code>hospitalId</code></td>
+          <td><code>activeDoctor, activeToken, status, lastUpdated</code></td>
+          <td>Broadcast queue state synced across TV lobby monitors and companion devices.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-blue">
+      <div class="callout-icon">ℹ️</div>
+      <div>
+        <strong>Multi-Tenancy Security Rule:</strong> Every single query across reception, doctor cabins, 
+        pharmacy, and analytics strictly filters by <code>hospitalId == userProfile.hospitalId</code>. Data 
+        never leaks across clinics or hospital branches.
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>ArogyaNext AI &bull; Technical Specification Document</span>
+      <span>Page 1 of 6</span>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ==================== PAGE 2: ROOT & CONFIGURATION FILES ==================== -->
+  <div class="page">
+    <div class="doc-header">
+      <div class="doc-title-main">Arogya<span>Next</span> AI</div>
+      <div class="doc-meta">Section 3: Project Configuration & Core Bootstrap Files</div>
+    </div>
+
+    <h2 class="section-title">3. Root Configuration & Application Bootstrap Files</h2>
+
+    <!-- package.json -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">package.json</span>
+        <span class="file-pill pill-config">Config & Manifest</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/package.json</span></div>
+        <div class="meta-row"><span class="meta-key">Type:</span><span class="meta-val">Node.js ES Module Manifest</span></div>
+        <div class="meta-row"><span class="meta-key">Scripts:</span><span class="meta-val">dev, build, lint, preview</span></div>
+        <div class="meta-row"><span class="meta-key">Frameworks:</span><span class="meta-val">React 19.2, Vite 8.0, Tailwind CSS 4.2</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">What It Contains:</div>
+        <p class="box-text">
+          Declares project dependencies, build toolchains, and runtime dependencies. Key packages include:
+          <span class="badge-tag">firebase (v12.11)</span> for Firestore and Authentication,
+          <span class="badge-tag">lucide-react (v0.577)</span> for clinical icons,
+          <span class="badge-tag">@tailwindcss/vite</span> and <span class="badge-tag">tailwindcss (v4.2)</span> for utility CSS, and
+          <span class="badge-tag">eslint (v9.39)</span> for React hooks linting.
+        </p>
+      </div>
+      <div class="content-box">
+        <div class="box-title">Runtime Behavior & Purpose:</div>
+        <ul class="bullet-list">
+          <li><strong>Development:</strong> Launches the Vite dev server with Hot Module Replacement (HMR).</li>
+          <li><strong>Production:</strong> Compiles React 19 JSX into minified ES chunks in the <code>/dist</code> directory.</li>
+          <li><strong>Zero bloated dependencies:</strong> No heavy external UI component kits; built with native DOM APIs, Canvas, SpeechSynthesis, and Tailwind for performance.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- vite.config.js -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">vite.config.js</span>
+        <span class="file-pill pill-config">Build Bundler Config</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/vite.config.js</span></div>
+        <div class="meta-row"><span class="meta-key">Bundler:</span><span class="meta-val">Vite 8.0</span></div>
+        <div class="meta-row"><span class="meta-key">Plugins:</span><span class="meta-val">@vitejs/plugin-react, @tailwindcss/vite</span></div>
+        <div class="meta-row"><span class="meta-key">Output:</span><span class="meta-val">Single Page Application (SPA)</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">What It Contains & Behavior:</div>
+        <p class="box-text">
+          Configures the Vite compiler. Directly integrates <code>tailwindcss()</code> as a first-class Vite plugin 
+          (Tailwind v4's new engine) avoiding legacy PostCSS latency. Enables Fast Refresh on React state changes during development.
+        </p>
+      </div>
+    </div>
+
+    <!-- vercel.json -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">vercel.json</span>
+        <span class="file-pill pill-config">Deployment Routing</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/vercel.json</span></div>
+        <div class="meta-row"><span class="meta-key">Target Platform:</span><span class="meta-val">Vercel Edge / Static CDN</span></div>
+        <div class="meta-row"><span class="meta-key">Rule:</span><span class="meta-val">URL Rewrites to /index.html</span></div>
+        <div class="meta-row"><span class="meta-key">Behavior:</span><span class="meta-val">SPA Deep-Link Routing Support</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">What It Contains & Behavior:</div>
+        <p class="box-text">
+          Defines a rewrite rule mapping all routes <code>/(.*)</code> to <code>/index.html</code>. 
+          Ensures that when hospital staff refresh pages or access direct sub-paths on cloud hosting (Vercel), 
+          the server returns the SPA root rather than a 404 error.
+        </p>
+      </div>
+    </div>
+
+    <!-- index.html -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">index.html</span>
+        <span class="file-pill pill-core">HTML Entry Point</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/index.html</span></div>
+        <div class="meta-row"><span class="meta-key">DOM Mounting:</span><span class="meta-val">&lt;div id="root"&gt;&lt;/div&gt;</span></div>
+        <div class="meta-row"><span class="meta-key">Script Module:</span><span class="meta-val">/src/main.jsx</span></div>
+        <div class="meta-row"><span class="meta-key">Icon:</span><span class="meta-val">/favicon.svg</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">What It Contains & Behavior:</div>
+        <p class="box-text">
+          Provides the initial HTML shell. Contains responsive viewport meta tags (`width=device-width, initial-scale=1.0`), 
+          links to the medical cross SVG favicon, and triggers module execution of <code>/src/main.jsx</code>.
+        </p>
+      </div>
+    </div>
+
+    <!-- src/main.jsx -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">src/main.jsx</span>
+        <span class="file-pill pill-core">React Root Initializer</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/src/main.jsx</span></div>
+        <div class="meta-row"><span class="meta-key">Imports:</span><span class="meta-val">StrictMode, createRoot, ./index.css, ./App.jsx</span></div>
+        <div class="meta-row"><span class="meta-key">Root Node:</span><span class="meta-val">document.getElementById('root')</span></div>
+        <div class="meta-row"><span class="meta-key">Mode:</span><span class="meta-val">React 19 StrictMode</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">What It Contains & Behavior:</div>
+        <p class="box-text">
+          Instantiates the React virtual DOM tree with <code>createRoot()</code>. Wraps <code>&lt;App /&gt;</code> in 
+          <code>&lt;StrictMode&gt;</code> to detect side-effects, deprecations, and race conditions in development. 
+          Imports global styling from <code>./index.css</code>.
+        </p>
+      </div>
+    </div>
+
+    <!-- src/firebase.js -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">src/firebase.js</span>
+        <span class="file-pill pill-core">Backend Cloud SDK Instance</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/src/firebase.js</span></div>
+        <div class="meta-row"><span class="meta-key">Exports:</span><span class="meta-val">db (Firestore), auth (FirebaseAuth)</span></div>
+        <div class="meta-row"><span class="meta-key">Firebase Project:</span><span class="meta-val">arogyanext-ab375</span></div>
+        <div class="meta-row"><span class="meta-key">Services:</span><span class="meta-val">Firestore Realtime DB, Firebase Auth</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">What It Contains & Behavior:</div>
+        <p class="box-text">
+          Initializes the Firebase App using credentials (API Key, authDomain, projectId, storageBucket, messagingSenderId). 
+          Exports the singletons <code>db</code> (cloud database) and <code>auth</code> (authentication service), 
+          which all panels throughout the application import for database reading and writing.
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>ArogyaNext AI &bull; Technical Specification Document</span>
+      <span>Page 2 of 6</span>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ==================== PAGE 3: STYLING & MASTER CONTROLLER ==================== -->
+  <div class="page">
+    <div class="doc-header">
+      <div class="doc-title-main">Arogya<span>Next</span> AI</div>
+      <div class="doc-meta">Section 4: Global Styles & Root Orchestrator App.jsx</div>
+    </div>
+
+    <!-- src/index.css -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">src/index.css</span>
+        <span class="file-pill pill-style">Global Styles & Animations</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/src/index.css</span></div>
+        <div class="meta-row"><span class="meta-key">Framework:</span><span class="meta-val">Tailwind CSS 4 (@import "tailwindcss")</span></div>
+        <div class="meta-row"><span class="meta-key">Keyframes:</span><span class="meta-val">marquee, neon-pulse, call-attention, sound-bar-1..4</span></div>
+        <div class="meta-row"><span class="meta-key">Special Utility:</span><span class="meta-val">Custom Dark Scrollbar, Touch Optimization</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">What It Contains:</div>
+        <ul class="bullet-list">
+          <li><strong>CSS Reset & Touch:</strong> Sets <code>scroll-behavior: smooth</code>, disables 300ms mobile tap delays with <code>-webkit-tap-highlight-color: transparent</code>, and clamps horizontal overflow.</li>
+          <li><strong>Modern Dark Scrollbar:</strong> Styled webkit scrollbars with slate-900 background track and rounded slate-600 thumb.</li>
+          <li><strong><code>animate-marquee</code>:</strong> 28-second continuous ticker animation that pauses on user hover. Used for emergency lobby news.</li>
+          <li><strong><code>animate-neon-pulse</code>:</strong> Cycling emerald glow effect with box-shadows applied to active consulting tokens.</li>
+          <li><strong><code>animate-call-attention</code>:</strong> Subtle 1.04x scale heartbeat pulse for active calling banners.</li>
+          <li><strong><code>animate-sound-1..4</code>:</strong> Sound wave equalizer bars simulating real-time audio playback during voice announcements.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- src/App.css -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">src/App.css</span>
+        <span class="file-pill pill-style">Legacy CSS Utilities</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/src/App.css</span></div>
+        <div class="meta-row"><span class="meta-key">Purpose:</span><span class="meta-val">Isometric hero graphics, button focus outlines</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">What It Contains & Behavior:</div>
+        <p class="box-text">
+          Provides supplemental styling for 3D isometric transforms, perspective layers, button accessibility outlines, 
+          and documentation next-step containers.
+        </p>
+      </div>
+    </div>
+
+    <!-- src/App.jsx -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">src/App.jsx</span>
+        <span class="file-pill pill-core">Root Orchestrator & View Switcher</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/src/App.jsx</span></div>
+        <div class="meta-row"><span class="meta-key">State Hooks:</span><span class="meta-val">user, userProfile, currentView, isAuthenticating, showAuthScreen, mobileMenuOpen</span></div>
+        <div class="meta-row"><span class="meta-key">Listeners:</span><span class="meta-val">onAuthStateChanged(auth)</span></div>
+        <div class="meta-row"><span class="meta-key">Tabs Handled:</span><span class="meta-val">receptionist, doctor, smartPad, pharmacy, hospitalAdmin, tv, admin</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">What It Contains:</div>
+        <p class="box-text">
+          Acts as the brain of the frontend application. It orchestrates user authentication, role-based access control (RBAC), 
+          multi-device responsive navigation, and conditional rendering of the appropriate clinical panel.
+        </p>
+      </div>
+      <div class="content-box">
+        <div class="box-title">Detailed Runtime Behavior & Flow:</div>
+        <ul class="bullet-list">
+          <li><strong>Auth Initialization:</strong> While verifying auth tokens, renders a dark animated splash screen with a bouncing caduceus (⚕️).</li>
+          <li><strong>Public vs Staff Gate:</strong> If no user is logged in, renders <code>&lt;LandingPage /&gt;</code>. If the user clicks "Staff Login", toggles <code>showAuthScreen = true</code> to display <code>&lt;Auth /&gt;</code> with a back button.</li>
+          <li><strong>Role Routing on Login:</strong> Upon login, queries <code>users/{uid}</code> from Firestore. Dynamically defaults the active view based on <code>profile.role</code>:
+            <em>Doctor</em> &rarr; Doctor Workspace,
+            <em>Pharmacist</em> &rarr; E-Pharmacy,
+            <em>Hospital Admin</em> &rarr; Analytics Hub,
+            <em>Super Admin</em> &rarr; Founder Console,
+            <em>Receptionist</em> &rarr; Front Desk.
+          </li>
+          <li><strong>Role-Based Navigation Tabs:</strong> Filters the master tab array so staff can only see and access authorized modules. For example, doctors see Doctor & Smart Pad; pharmacists see Pharmacy & TV; Super Admins see all 7 modules.</li>
+          <li><strong>Mobile UI Support:</strong> Features dual mobile navigation: an interactive hamburger drawer and a horizontal scrollable pill bar, ensuring effortless one-thumb operation on smartphones.</li>
+          <li><strong>Header Bar:</strong> Displays the hospital access code (e.g. <code>HOSP_X92K</code>), authenticated staff name, role badge, and a one-click <code>signOut()</code> action.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- src/Auth.jsx -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">src/Auth.jsx</span>
+        <span class="file-pill pill-ui">Staff Authentication Portal</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/src/Auth.jsx</span></div>
+        <div class="meta-row"><span class="meta-key">State Hooks:</span><span class="meta-val">isLogin, isForgotPassword, email, password, fullName, hospitalId, role, showPassword, isLoading, error</span></div>
+        <div class="meta-row"><span class="meta-key">Firebase APIs:</span><span class="meta-val">signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, setDoc</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">What It Contains & Detailed Behavior:</div>
+        <ul class="bullet-list">
+          <li><strong>Tri-Mode Form:</strong> Smoothly switches between <em>Sign In</em>, <em>Create Staff Account</em>, and <em>Forgot Password</em>.</li>
+          <li><strong>Hospital ID Validation:</strong> When creating a staff account (unless role is Super Admin), checks if <code>hospitals/{hospitalId.toUpperCase()}</code> exists in Firestore. If invalid, blocks signup and alerts the user.</li>
+          <li><strong>Automatic Doctor Directory Registration:</strong> When a user with the role "Doctor" registers, the component creates both a <code>users/{uid}</code> document AND a <code>doctors/{uid}</code> record so front-desk staff can assign patients to them immediately.</li>
+          <li><strong>Security & UX:</strong> Features an eye icon to toggle password visibility, uppercase auto-formatting for hospital codes, and self-clearing error banners with friendly messages.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>ArogyaNext AI &bull; Technical Specification Document</span>
+      <span>Page 3 of 6</span>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ==================== PAGE 4: PUBLIC LANDING & CLINICAL PANELS ==================== -->
+  <div class="page">
+    <div class="doc-header">
+      <div class="doc-title-main">Arogya<span>Next</span> AI</div>
+      <div class="doc-meta">Section 5: Landing Page & Operational Panels</div>
+    </div>
+
+    <!-- src/LandingPage.jsx -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">src/LandingPage.jsx</span>
+        <span class="file-pill pill-ui">Public Showcase & Marketing</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/src/LandingPage.jsx</span></div>
+        <div class="meta-row"><span class="meta-key">Sections:</span><span class="meta-val">Hero, Features Grid (OCR, Voice, Triage), Workflow, Pricing, Demo Modal</span></div>
+        <div class="meta-row"><span class="meta-key">Props:</span><span class="meta-val">onLoginClick (triggers staff login modal)</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">What It Contains & Behavior:</div>
+        <p class="box-text">
+          A landing page highlighting ArogyaNext's capabilities:
+        </p>
+        <ul class="bullet-list">
+          <li><strong>On-Device Prescription OCR:</strong> Highlights Google ML Kit text recognition for converting old paper prescriptions to digital notes.</li>
+          <li><strong>Multi-Language Voice AI:</strong> Details regional speech triage supporting 6 Indian languages (Hindi, Tamil, Telugu, Marathi, Bengali, English).</li>
+          <li><strong>Interactive Demo Lead Form:</strong> Built-in modal allowing hospital administrators to request a custom clinic deployment.</li>
+          <li><strong>Pricing & Commercial Calculator:</strong> Showcases the SaaS pricing tier (₹999/month base + ₹500/doctor) with a 6-month free pilot promotion.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- src/ReceptionistPanel.jsx -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">src/ReceptionistPanel.jsx</span>
+        <span class="file-pill pill-feature">Front Desk Control Center</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/src/ReceptionistPanel.jsx</span></div>
+        <div class="meta-row"><span class="meta-key">Props:</span><span class="meta-val">hospitalId</span></div>
+        <div class="meta-row"><span class="meta-key">State Hooks:</span><span class="meta-val">patientName, patientAge, symptoms, selectedDoctor, isEmergency, appointmentDate, timeSlot, doctorsList, todaysPatients</span></div>
+        <div class="meta-row"><span class="meta-key">Firestore Listeners:</span><span class="meta-val">onSnapshot(appointments where status == 'Waiting' & date == today)</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">Detailed Behavior & Logic:</div>
+        <ul class="bullet-list">
+          <li><strong>Doctor Sync:</strong> On mount, queries <code>doctors</code> filtered by <code>hospitalId</code> to populate the doctor dropdown with real names and specialties.</li>
+          <li><strong>Smart Token Generation:</strong> Normal appointments generate <code>S-XX</code> tokens (e.g. S-42). Emergency walk-ins generate <code>E-XX</code> tokens (e.g. E-12) and bypass time slot requirements with status set to <code>IMMEDIATE</code>.</li>
+          <li><strong>Live Grouped Queues:</strong> Groups today's waiting appointments by doctor cabin in real-time. Receptionists can monitor workload distribution across all cabins simultaneously.</li>
+          <li><strong>Appointment Cancellation:</strong> Receptionists can cancel an appointment with a single tap, updating the Firestore status to <code>Cancelled</code> and removing the patient from doctor queues.</li>
+          <li><strong>OCR Indicator:</strong> If a patient booked via mobile with an uploaded prescription, an <code>📷 OCR Rx</code> badge appears alongside their token.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- src/DoctorPanel.jsx -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">src/DoctorPanel.jsx</span>
+        <span class="file-pill pill-feature">Doctor Clinical Workspace</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/src/DoctorPanel.jsx</span></div>
+        <div class="meta-row"><span class="meta-key">Props:</span><span class="meta-val">hospitalId, doctorName</span></div>
+        <div class="meta-row"><span class="meta-key">State Hooks:</span><span class="meta-val">waitingPatients, currentPatient, prescriptionText, currentStatus ('Active'|'Away')</span></div>
+        <div class="meta-row"><span class="meta-key">Updates:</span><span class="meta-val">appointments, doctor_status</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">Detailed Behavior & Logic:</div>
+        <ul class="bullet-list">
+          <li><strong>Doctor-Scoped Waiting Queue:</strong> Real-time snapshot listener listening only for patients assigned to this doctor with status <code>Waiting</code>. Emergency patients flash red at the top.</li>
+          <li><strong>Call In Action:</strong> When the doctor clicks "Call In", the appointment status changes to <code>In Consultation</code> and the doctor's document in <code>doctor_status</code> updates with <code>currentToken</code>, triggering notifications across the TV display and companion apps.</li>
+          <li><strong>Scanned Paper Rx (ML Kit OCR) Review:</strong> Displays the patient's scanned previous prescription text in a monospaced preview card. The doctor can click <em>"+ Insert into E-Prescription"</em> to append those notes into the digital prescription.</li>
+          <li><strong>Finish Consultation & E-Pharmacy Sync:</strong> Doctor enters medicine notes and clicks "Finish Consultation". This sets appointment status to <code>Completed</code> and, if medicines were typed, sets <code>pharmacyStatus = 'Pending'</code>, routing the prescription to the hospital pharmacy counter.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>ArogyaNext AI &bull; Technical Specification Document</span>
+      <span>Page 4 of 6</span>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ==================== PAGE 5: SMART PAD, TV DISPLAY & PHARMACY ==================== -->
+  <div class="page">
+    <div class="doc-header">
+      <div class="doc-title-main">Arogya<span>Next</span> AI</div>
+      <div class="doc-meta">Section 6: Specialized Digital Health Panels</div>
+    </div>
+
+    <!-- src/SmartPrescriptionPanel.jsx -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">src/SmartPrescriptionPanel.jsx</span>
+        <span class="file-pill pill-feature">Smart Letterhead & Stylus Signature</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/src/SmartPrescriptionPanel.jsx</span></div>
+        <div class="meta-row"><span class="meta-key">Props:</span><span class="meta-val">hospitalId, doctorName</span></div>
+        <div class="meta-row"><span class="meta-key">Key Tech:</span><span class="meta-val">HTML5 Canvas (2D Context), LocalStorage Base64, CSS Print Media</span></div>
+        <div class="meta-row"><span class="meta-key">Controls:</span><span class="meta-val">Margin Top slider, Signature Bottom slider, Mask Lines toggle</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">Detailed Behavior & Logic:</div>
+        <ul class="bullet-list">
+          <li><strong>Custom Letterhead Upload:</strong> Doctors can upload a PNG/JPEG image of their clinic letterhead. The file is converted into Base64 and stored in <code>localStorage</code> per doctor, loading instantly on subsequent visits.</li>
+          <li><strong>Pixel-Perfect Calibrated Alignment:</strong> Doctors use sliders to align where patient info and prescription text appear over their printed letterhead lines, and can toggle "Mask Background Lines" to prevent text collision.</li>
+          <li><strong>Stylus Signature Pad:</strong> Uses a 2x retina-scaled HTML5 Canvas with pointer event listeners (<code>onPointerDown</code>, <code>onPointerMove</code>, <code>onPointerUp</code>) supporting Apple Pencil, Surface Pen, or touch signatures.</li>
+          <li><strong>Print & Pharmacy Sync:</strong> When clicking "Finish, Send & Print", the component updates Firestore (routing to pharmacy) and invokes <code>window.print()</code>. Using print CSS, the UI toolbars disappear and only the letterhead prescription prints.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- src/TVDisplay.jsx -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">src/TVDisplay.jsx</span>
+        <span class="file-pill pill-feature">Lobby TV Signage & Voice Announcements</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/src/TVDisplay.jsx</span></div>
+        <div class="meta-row"><span class="meta-key">Props:</span><span class="meta-val">hospitalId</span></div>
+        <div class="meta-row"><span class="meta-key">APIs Used:</span><span class="meta-val">Web Speech API (speechSynthesis), Firestore Real-Time Query</span></div>
+        <div class="meta-row"><span class="meta-key">Visuals:</span><span class="meta-val">Blinking Digital Clock, Neon Active Token Glow, Audio Equalizer Bars, Marquee Notice</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">Detailed Behavior & Logic:</div>
+        <ul class="bullet-list">
+          <li><strong>Full Screen TV Layout:</strong> Designed for 55"+ smart TVs mounted in hospital waiting lobbies. Displays high-contrast text readable from across the room.</li>
+          <li><strong>Multi-Doctor Cabin Grid:</strong> Dynamically splits into side-by-side cards for each doctor on duty. Left half shows the active token in glowing emerald font; right half shows the next 4 patients in line.</li>
+          <li><strong>Speech Synthesis (TTS) Engine:</strong> When any doctor calls a token, an utterance is synthesized: <em>"Token number S 14, please proceed to Dr. Sharma's cabin."</em> Accompanied by a floating announcement banner and animated equalizer bars.</li>
+          <li><strong>Continuous Broadcast Marquee:</strong> Bottom ticker displays clinic notices, reminding patients about token announcements and emergency procedures.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- src/PharmacyPanel.jsx -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">src/PharmacyPanel.jsx</span>
+        <span class="file-pill pill-feature">E-Pharmacy Fulfillment Counter</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/src/PharmacyPanel.jsx</span></div>
+        <div class="meta-row"><span class="meta-key">Props:</span><span class="meta-val">hospitalId</span></div>
+        <div class="meta-row"><span class="meta-key">Firestore Listener:</span><span class="meta-val">appointments where hospitalId == id & pharmacyStatus == 'Pending'</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">Detailed Behavior & Logic:</div>
+        <ul class="bullet-list">
+          <li><strong>Real-Time Medicine Queue:</strong> Real-time listener for any appointment in the facility where <code>pharmacyStatus == 'Pending'</code>. When a doctor finishes a consultation, the order appears immediately.</li>
+          <li><strong>Prescription Cards:</strong> Displays patient name, prescribing doctor, emergency badge (if urgent), and full medicine list.</li>
+          <li><strong>Fulfillment Action:</strong> Pharmacist prepares medicines and clicks "Mark as Dispensed ✅", updating the record to <code>pharmacyStatus = 'Dispensed'</code> and clearing the card from the active queue.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>ArogyaNext AI &bull; Technical Specification Document</span>
+      <span>Page 5 of 6</span>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ==================== PAGE 6: ADMIN, ANALYTICS, ASSETS & SUMMARY ==================== -->
+  <div class="page">
+    <div class="doc-header">
+      <div class="doc-title-main">Arogya<span>Next</span> AI</div>
+      <div class="doc-meta">Section 7: Analytics, Multi-Tenant Governance & Asset Index</div>
+    </div>
+
+    <!-- src/HospitalAdmin.jsx -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">src/HospitalAdmin.jsx</span>
+        <span class="file-pill pill-admin">Director Analytics & CSV Export</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/src/HospitalAdmin.jsx</span></div>
+        <div class="meta-row"><span class="meta-key">Props:</span><span class="meta-val">hospitalId</span></div>
+        <div class="meta-row"><span class="meta-key">Metrics:</span><span class="meta-val">Patients Today, Pharmacy Revenue, Avg Wait Time, Active Doctors</span></div>
+        <div class="meta-row"><span class="meta-key">Exports:</span><span class="meta-val">CSV Reports (1 Day, 7 Days, 1 Month, 6 Months, 1 Year)</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">Detailed Behavior & Logic:</div>
+        <ul class="bullet-list">
+          <li><strong>Hospital Director KPI Matrix:</strong> Displays four operational metric tiles with trend percentages and status indicators.</li>
+          <li><strong>CSV Report Generator:</strong> Queries historical appointments from Firestore for the selected timeframe. Formats timestamps, token IDs, doctor names, consultation status, and pharmacy fulfillment into CSV format, then triggers an automatic browser download.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- src/AdminPanel.jsx -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">src/AdminPanel.jsx</span>
+        <span class="file-pill pill-admin">Founder Console (Super Admin)</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/src/AdminPanel.jsx</span></div>
+        <div class="meta-row"><span class="meta-key">Role:</span><span class="meta-val">Restricted to Super Admin ('SYSTEM_MASTER')</span></div>
+        <div class="meta-row"><span class="meta-key">Actions:</span><span class="meta-val">Create Hospital, Delete Hospital, Delete Staff Member</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">Detailed Behavior & Logic:</div>
+        <ul class="bullet-list">
+          <li><strong>Platform-Wide Overview:</strong> Summarizes total active hospitals, total registered doctors, and total staff members across the platform.</li>
+          <li><strong>Hospital Workspace Generator:</strong> Generates unique alphanumeric access codes (e.g. <code>HOSP_9X8B2</code>) and writes a document to <code>hospitals</code>.</li>
+          <li><strong>Staff Account Governance:</strong> Lists all registered staff members under each hospital tenant. Super Admin can remove compromised accounts with a single click.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- src/TabletDoctorPanel.jsx -->
+    <div class="file-card">
+      <div class="file-header">
+        <span class="file-name">src/TabletDoctorPanel.jsx</span>
+        <span class="file-pill pill-feature">Stylus Freehand Tablet Pad</span>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-row"><span class="meta-key">Path:</span><span class="meta-val">/src/TabletDoctorPanel.jsx</span></div>
+        <div class="meta-row"><span class="meta-key">Purpose:</span><span class="meta-val">Tablet-optimized freehand sketching with simulated AI OCR translation</span></div>
+      </div>
+      <div class="content-box">
+        <div class="box-title">What It Contains & Behavior:</div>
+        <p class="box-text">
+          A dedicated tablet workspace featuring physical notepad ruling lines on HTML5 Canvas. Doctors write freehand prescriptions with a stylus; 
+          clicking <em>"Process Handwriting (OCR)"</em> translates the handwriting into editable digital text, which can be sent directly to the pharmacy.
+        </p>
+      </div>
+    </div>
+
+    <!-- Static Assets & SVG Reference -->
+    <h2 class="section-title">4. Static Assets & Public Files</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>File Path</th>
+          <th>Type / Format</th>
+          <th>Role in Application</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>public/favicon.svg</code></td>
+          <td>Scalable Vector Graphic</td>
+          <td>Hospital caduceus cross icon rendered in browser tabs.</td>
+        </tr>
+        <tr>
+          <td><code>public/icons.svg</code></td>
+          <td>SVG Sprite Sheet</td>
+          <td>UI vector iconography for medical tools, stethoscopes, pills, and checkmarks.</td>
+        </tr>
+        <tr>
+          <td><code>src/assets/hero.png</code></td>
+          <td>High-Res Raster Image</td>
+          <td>Hero visual artwork showcasing mobile and desktop clinic interfaces.</td>
+        </tr>
+        <tr>
+          <td><code>src/assets/react.svg</code> &amp; <code>vite.svg</code></td>
+          <td>SVG Vector Logos</td>
+          <td>Vite and React framework branding assets.</td>
+        </tr>
+        <tr>
+          <td><code>ArogyaNext_Pitch_Deck.html</code></td>
+          <td>Presentation Deck HTML</td>
+          <td>Executive slide deck outlining market opportunity, traction, and ROI for investors.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-green">
+      <div class="callout-icon">✅</div>
+      <div>
+        <strong>System Integrity Verification:</strong> All files adhere to strict modular separation. 
+        State updates propagate reactively via Firestore <code>onSnapshot</code> listeners, delivering real-time, 
+        sub-second synchronization across all 7 operational interfaces.
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>ArogyaNext AI &bull; Technical Specification Document</span>
+      <span>Page 6 of 6</span>
+    </div>
+  </div>
+
+</body>
+</html>

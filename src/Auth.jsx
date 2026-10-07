@@ -118,10 +118,10 @@ export default function Auth() {
             <form onSubmit={handlePasswordReset} className="space-y-4 sm:space-y-5">
               <p className="text-xs sm:text-sm text-slate-500 mb-4">Enter your email address and we will send you a secure link to reset your password.</p>
               <div>
-                <label className="block text-xs sm:text-sm font-bold text-slate-600 mb-1.5">Email Address</label>
+                <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5">Email Address</label>
                 <input 
                   type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-sm rounded-xl border focus:border-blue-500 focus:ring-2 outline-none bg-slate-50 transition-all" 
+                  className="w-full px-4 py-3 text-sm rounded-xl border-2 border-slate-300 bg-slate-50/70 hover:bg-white focus:bg-white text-slate-900 font-medium placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm" 
                   placeholder="admin@hospital.com"
                 />
               </div>
@@ -148,18 +148,18 @@ export default function Auth() {
                 {!isLogin && (
                   <>
                     <div>
-                      <label className="block text-xs sm:text-sm font-bold text-slate-600 mb-1.5">Full Name</label>
+                      <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5">Full Name</label>
                       <input 
                         type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)}
-                        className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-sm rounded-xl border focus:border-blue-500 focus:ring-2 outline-none bg-slate-50 transition-all" 
+                        className="w-full px-4 py-3 text-sm rounded-xl border-2 border-slate-300 bg-slate-50/70 hover:bg-white focus:bg-white text-slate-900 font-medium placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm" 
                         placeholder="e.g. Dr. Jane Doe"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs sm:text-sm font-bold text-slate-600 mb-1.5">Staff Role</label>
+                      <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5">Staff Role</label>
                       <select 
                         required value={role} onChange={(e) => setRole(e.target.value)}
-                        className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-sm rounded-xl border focus:border-blue-500 focus:ring-2 outline-none bg-slate-50 transition-all"
+                        className="w-full px-4 py-3 text-sm rounded-xl border-2 border-slate-300 bg-slate-50/70 hover:bg-white focus:bg-white text-slate-900 font-semibold focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm cursor-pointer"
                       >
                         <option value="Receptionist">Receptionist</option>
                         <option value="Doctor">Doctor</option>
@@ -169,10 +169,10 @@ export default function Auth() {
                     </div>
                     {role !== 'Super Admin' && (
                       <div>
-                        <label className="block text-xs sm:text-sm font-bold text-slate-600 mb-1.5">Hospital Access Code</label>
+                        <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5">Hospital Access Code</label>
                         <input 
                           type="text" required value={hospitalId} onChange={(e) => setHospitalId(e.target.value)}
-                          className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-sm rounded-xl border focus:border-blue-500 focus:ring-2 outline-none bg-slate-50 transition-all uppercase" 
+                          className="w-full px-4 py-3 text-sm rounded-xl border-2 border-slate-300 bg-slate-50/70 hover:bg-white focus:bg-white text-slate-900 font-semibold placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm uppercase" 
                           placeholder="e.g. HOSP_X92K"
                         />
                       </div>
@@ -180,17 +180,17 @@ export default function Auth() {
                   </>
                 )}
                 <div>
-                  <label className="block text-xs sm:text-sm font-bold text-slate-600 mb-1.5">Email Address</label>
+                  <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5">Email Address</label>
                   <input 
                     type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 text-sm rounded-xl border focus:border-blue-500 focus:ring-2 outline-none bg-slate-50 transition-all" 
+                    className="w-full px-4 py-3 text-sm rounded-xl border-2 border-slate-300 bg-slate-50/70 hover:bg-white focus:bg-white text-slate-900 font-medium placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm" 
                     placeholder="name@hospital.com"
                   />
                 </div>
                 
                 <div>
                   <div className="flex justify-between items-center mb-1.5">
-                    <label className="block text-xs sm:text-sm font-bold text-slate-600">Password</label>
+                    <label className="block text-xs sm:text-sm font-bold text-slate-700">Password</label>
                     {isLogin && (
                       <button 
                         type="button"
@@ -205,7 +205,7 @@ export default function Auth() {
                     <input 
                       type={showPassword ? "text" : "password"} 
                       required value={password} onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-3.5 sm:pl-4 pr-11 py-2.5 sm:py-3 text-sm rounded-xl border focus:border-blue-500 focus:ring-2 outline-none bg-slate-50 transition-all" 
+                      className="w-full pl-4 pr-11 py-3 text-sm rounded-xl border-2 border-slate-300 bg-slate-50/70 hover:bg-white focus:bg-white text-slate-900 font-medium placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm" 
                       placeholder="••••••••"
                     />
                     <button
