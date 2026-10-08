@@ -6,7 +6,7 @@ export default function LandingPage({ onLoginClick }) {
   const [modalState, setModalState] = useState('form'); 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  // Pre-filled with your data!
+  // Pre-filled with your data
   const [hospName, setHospName] = useState('');
   const [userName, setUserName] = useState('Md Shakil Akhtar');
   const [email, setEmail] = useState('');
@@ -18,12 +18,12 @@ export default function LandingPage({ onLoginClick }) {
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
   const sampleLanguages = [
-    { name: 'English', native: 'English', text: 'Doctor, I have a persistent dry cough and slight fever for 3 days.', voice: 'Doctor, I have a persistent dry cough and slight fever for 3 days.' },
-    { name: 'Hindi', native: 'हिन्दी', text: 'डॉक्टर साहब, मुझे 3 दिनों से तेज़ बुखार और सिरदर्द है।', voice: 'Doctor sahab, mujhe teen dinon se tez bukhar aur sirdard hai.' },
-    { name: 'Tamil', native: 'தமிழ்', text: 'மருத்துவரே, எனக்கு மூன்று நாட்களாக கடுமையான தலைவலி உள்ளது.', voice: 'Maruthuvare, enakku moondru naatkalaga kadumaiyana thalaivali ulladhu.' },
-    { name: 'Telugu', native: 'తెలుగు', text: 'డాక్టర్ గారు, నాకు మూడు రోజులుగా జ్వరం మరియు దగ్గు ఉంది.', voice: 'Doctor gaaru, naaku moodu rojula gaa jvaram mariyu daggu undhi.' },
-    { name: 'Marathi', native: 'मराठी', text: 'डॉक्टर, मला तीन दिवसांपासून खूप ताप आणि खोकला आहे.', voice: 'Doctor, mala teen divasanpasun khoop taap aani khokla aahe.' },
-    { name: 'Bengali', native: 'বাংলা', text: 'ডাক্তারবাবু, আমার তিন দিন ধরে জ্বর এবং কাশি হচ্ছে।', voice: 'Doctorbabu, amar teen din dhore jwor ebong kashi hochhe.' },
+    { name: 'English', native: 'English', text: 'Doctor, I have a persistent dry cough and slight fever for 3 days.', voice: 'Doctor, I have a persistent dry cough and slight fever for 3 days.', color: 'from-blue-500 to-indigo-600' },
+    { name: 'Hindi', native: 'हिन्दी', text: 'डॉक्टर साहब, मुझे 3 दिनों से तेज़ बुखार और सिरदर्द है।', voice: 'Doctor sahab, mujhe teen dinon se tez bukhar aur sirdard hai.', color: 'from-amber-500 to-orange-600' },
+    { name: 'Tamil', native: 'தமிழ்', text: 'மருத்துவரே, எனக்கு மூன்று நாட்களாக கடுமையான தலைவலி உள்ளது.', voice: 'Maruthuvare, enakku moondru naatkalaga kadumaiyana thalaivali ulladhu.', color: 'from-emerald-500 to-teal-600' },
+    { name: 'Telugu', native: 'తెలుగు', text: 'డాక్టర్ గారు, నాకు మూడు రోజులుగా జ్వరం మరియు దగ్గు ఉంది.', voice: 'Doctor gaaru, naaku moodu rojula gaa jvaram mariyu daggu undhi.', color: 'from-cyan-500 to-blue-600' },
+    { name: 'Marathi', native: 'मराठी', text: 'डॉक्टर, मला तीन दिवसांपासून खूप ताप आणि खोकला आहे.', voice: 'Doctor, mala teen divasanpasun khoop taap aani khokla aahe.', color: 'from-purple-500 to-pink-600' },
+    { name: 'Bengali', native: 'বাংলা', text: 'ডাক্তারবাবু, আমার তিন দিন ধরে জ্বর এবং কাশি হচ্ছে।', voice: 'Doctorbabu, amar teen din dhore jwor ebong kashi hochhe.', color: 'from-rose-500 to-red-600' },
   ];
 
   const handleTestSpeech = (text) => {
@@ -38,7 +38,6 @@ export default function LandingPage({ onLoginClick }) {
     }
   };
 
-  // Smooth scroll function for the navigation links
   const scrollToSection = (id) => {
     setMobileMenuOpen(false);
     const element = document.getElementById(id);
@@ -47,7 +46,6 @@ export default function LandingPage({ onLoginClick }) {
     }
   };
 
-  // Handle the Demo Form Submission
   const handleDemoSubmit = (e) => {
     e.preventDefault();
     setModalState('success');
@@ -60,15 +58,22 @@ export default function LandingPage({ onLoginClick }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 font-sans text-slate-300 selection:bg-blue-500/30 relative overflow-x-hidden">
+    <div className="min-h-screen bg-slate-950 font-sans text-slate-200 selection:bg-indigo-500/30 relative overflow-x-hidden">
       
+      {/* Background Ambient Glow Gradients */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-blue-600/15 rounded-full blur-[140px]"></div>
+        <div className="absolute top-[30%] -right-40 w-[600px] h-[600px] bg-purple-600/12 rounded-full blur-[150px]"></div>
+        <div className="absolute bottom-[20%] left-1/3 w-[700px] h-[500px] bg-teal-600/10 rounded-full blur-[160px]"></div>
+      </div>
+
       {/* --- POPUP DEMO MODAL --- */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm transition-all">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl sm:rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md transition-all animate-fadeIn">
+          <div className="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-700/80 rounded-2xl sm:rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative max-h-[92vh] overflow-y-auto ring-1 ring-white/10">
             <button 
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-lg text-lg transition-colors"
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors text-sm"
               aria-label="Close modal"
             >
               ✕
@@ -76,34 +81,49 @@ export default function LandingPage({ onLoginClick }) {
 
             {modalState === 'form' ? (
               <>
-                <h3 className="text-xl sm:text-2xl font-black text-white mb-2">Request a Demo</h3>
-                <p className="text-slate-400 mb-6 text-xs sm:text-sm">Leave your details and our team will set up your hospital's custom ArogyaNext workspace.</p>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[10px] font-bold uppercase tracking-wider mb-2">
+                  <span>🏥 Free 6-Month Pilot</span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-white mb-2">Request Hospital Demo</h3>
+                <p className="text-slate-400 mb-6 text-xs sm:text-sm">Experience live voice triage, AI token displays, and on-device OCR tailored to your clinic.</p>
+                
                 <form onSubmit={handleDemoSubmit} className="space-y-4">
-                  <input 
-                    type="text" required placeholder="Hospital / Clinic Name" 
-                    value={hospName} onChange={(e) => setHospName(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 text-sm transition-colors" 
-                  />
-                  <input 
-                    type="text" required placeholder="Your Name" 
-                    value={userName} onChange={(e) => setUserName(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 text-sm transition-colors" 
-                  />
-                  <input 
-                    type="email" required placeholder="Work Email" 
-                    value={email} onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 text-sm transition-colors" 
-                  />
-                  <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-500/20 active:scale-98">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Hospital / Clinic Name</label>
+                    <input 
+                      type="text" required placeholder="e.g. Apollo Metro Care" 
+                      value={hospName} onChange={(e) => setHospName(e.target.value)}
+                      className="w-full bg-slate-950/80 border-2 border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 text-sm outline-none transition-all focus:ring-4 focus:ring-indigo-500/10" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Contact Person</label>
+                    <input 
+                      type="text" required placeholder="Your Name" 
+                      value={userName} onChange={(e) => setUserName(e.target.value)}
+                      className="w-full bg-slate-950/80 border-2 border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 text-sm outline-none transition-all focus:ring-4 focus:ring-indigo-500/10" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Official Work Email</label>
+                    <input 
+                      type="email" required placeholder="admin@hospital.com" 
+                      value={email} onChange={(e) => setEmail(e.target.value)}
+                      className="w-full bg-slate-950/80 border-2 border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 text-sm outline-none transition-all focus:ring-4 focus:ring-indigo-500/10" 
+                    />
+                  </div>
+                  <button type="submit" className="w-full py-3.5 rounded-xl font-black text-sm text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-indigo-500/25 transition-all active:scale-98 mt-2">
                     Submit Request
                   </button>
                 </form>
               </>
             ) : (
               <div className="text-center py-8">
-                <div className="text-5xl mb-4">✅</div>
-                <h3 className="text-xl sm:text-2xl font-black text-white mb-2">Request Sent!</h3>
-                <p className="text-slate-400 text-sm">Our onboarding team will contact you within 24 hours.</p>
+                <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-3xl flex items-center justify-center mx-auto mb-4">
+                  ✓
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-white mb-2">Request Received!</h3>
+                <p className="text-slate-400 text-sm">Our hospital onboarding engineers will reach out within 24 hours.</p>
               </div>
             )}
           </div>
@@ -111,57 +131,55 @@ export default function LandingPage({ onLoginClick }) {
       )}
 
       {/* --- NAVBAR --- */}
-      <nav className="border-b border-slate-800 bg-slate-950/75 backdrop-blur-md sticky top-0 z-50">
+      <nav className="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           
-          {/* Brand Logo */}
+          {/* Brand Logo with glowing medical emblem */}
           <div 
-            className="text-xl sm:text-2xl font-black tracking-wider text-white flex items-center cursor-pointer select-none" 
+            className="flex items-center gap-2.5 cursor-pointer select-none group" 
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
-            Arogya<span className="text-blue-500">Next</span>
-            <span className="ml-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded font-black tracking-widest uppercase">
-              AI
-            </span>
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center font-black text-white text-base shadow-lg shadow-blue-500/30 group-hover:scale-105 transition-transform ring-1 ring-white/20">
+              ✚
+            </div>
+            <div className="text-xl sm:text-2xl font-black tracking-tight text-white">
+              Arogya<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-cyan-300">Next</span>
+              <span className="ml-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full font-black tracking-widest uppercase shadow-sm border border-blue-400/30">
+                AI OS
+              </span>
+            </div>
           </div>
 
-          {/* Desktop Links */}
-          <div className="hidden md:flex space-x-8 font-medium text-sm text-slate-400">
-            <button onClick={() => scrollToSection('features')} className="hover:text-white transition-colors cursor-pointer">Features</button>
-            <button onClick={() => scrollToSection('how-it-works')} className="hover:text-white transition-colors cursor-pointer">How it Works</button>
-            <button onClick={() => scrollToSection('pricing')} className="hover:text-white transition-colors cursor-pointer">For Hospitals</button>
+          {/* Desktop Navigation Links */}
+          <div className="hidden md:flex items-center space-x-1 lg:space-x-2 font-semibold text-xs lg:text-sm text-slate-400">
+            <button onClick={() => scrollToSection('features')} className="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-900/80 transition-all cursor-pointer">Platform Features</button>
+            <button onClick={() => scrollToSection('simulator')} className="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-900/80 transition-all cursor-pointer">Interactive Simulator</button>
+            <button onClick={() => scrollToSection('how-it-works')} className="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-900/80 transition-all cursor-pointer">How It Works</button>
+            <button onClick={() => scrollToSection('pricing')} className="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-900/80 transition-all cursor-pointer">For Clinics</button>
           </div>
 
           {/* Action Buttons & Mobile Hamburger */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             <button 
               onClick={onLoginClick}
-              className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm text-white hover:bg-slate-800 transition-colors border border-slate-700 active:scale-95"
+              className="px-3.5 sm:px-4 py-2 rounded-xl font-bold text-xs sm:text-sm text-slate-200 hover:text-white hover:bg-slate-900 border border-slate-700/80 transition-all active:scale-95 shadow-sm"
             >
-              Staff Login
+              Staff Portal
             </button>
             <button 
               onClick={() => setIsModalOpen(true)}
-              className="hidden sm:inline-flex px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20 transition-all active:scale-95"
+              className="hidden sm:inline-flex px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-black text-xs sm:text-sm text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 shadow-md shadow-blue-500/25 transition-all active:scale-95 border border-blue-400/30"
             >
-              Book a Demo
+              Book Free Demo
             </button>
             
             {/* Mobile Hamburger Toggle */}
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none transition-colors"
+              className="md:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900 border border-slate-800 transition-colors"
               aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              )}
+              {mobileMenuOpen ? '✕' : '☰'}
             </button>
           </div>
 
@@ -169,31 +187,37 @@ export default function LandingPage({ onLoginClick }) {
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-slate-950 border-b border-slate-800 px-4 py-4 space-y-3">
+          <div className="md:hidden bg-slate-950/95 border-b border-slate-800 px-4 py-4 space-y-2 backdrop-blur-xl animate-fadeIn">
             <button 
               onClick={() => scrollToSection('features')} 
-              className="block w-full text-left py-2 px-3 rounded-lg text-slate-300 font-medium hover:bg-slate-900 transition-colors"
+              className="block w-full text-left py-2 px-3 rounded-lg text-slate-300 font-bold hover:bg-slate-900"
             >
-              Features
+              Platform Features
+            </button>
+            <button 
+              onClick={() => scrollToSection('simulator')} 
+              className="block w-full text-left py-2 px-3 rounded-lg text-slate-300 font-bold hover:bg-slate-900"
+            >
+              Live Simulator
             </button>
             <button 
               onClick={() => scrollToSection('how-it-works')} 
-              className="block w-full text-left py-2 px-3 rounded-lg text-slate-300 font-medium hover:bg-slate-900 transition-colors"
+              className="block w-full text-left py-2 px-3 rounded-lg text-slate-300 font-bold hover:bg-slate-900"
             >
-              How it Works
+              How It Works
             </button>
             <button 
               onClick={() => scrollToSection('pricing')} 
-              className="block w-full text-left py-2 px-3 rounded-lg text-slate-300 font-medium hover:bg-slate-900 transition-colors"
+              className="block w-full text-left py-2 px-3 rounded-lg text-slate-300 font-bold hover:bg-slate-900"
             >
-              For Hospitals
+              For Clinics & Pricing
             </button>
             <div className="pt-2 border-t border-slate-800">
               <button 
                 onClick={() => { setMobileMenuOpen(false); setIsModalOpen(true); }}
-                className="w-full text-center py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-md"
+                className="w-full text-center py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-sm shadow-md"
               >
-                Book a Demo
+                Book a Free Demo
               </button>
             </div>
           </div>
@@ -201,85 +225,95 @@ export default function LandingPage({ onLoginClick }) {
       </nav>
 
       {/* --- HERO SECTION --- */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 md:pt-32 pb-16 sm:pb-28 md:pb-40 text-center overflow-hidden">
+      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 md:pt-28 pb-16 sm:pb-24 text-center z-10">
         
-        {/* Glow Spheres with mobile boundaries */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[500px] md:w-[750px] h-[250px] sm:h-[350px] bg-blue-600/20 blur-[90px] sm:blur-[120px] rounded-full pointer-events-none animate-pulse"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[220px] sm:w-[350px] md:w-[450px] h-[200px] sm:h-[280px] bg-purple-600/20 blur-[80px] sm:blur-[100px] rounded-full pointer-events-none animate-pulse"></div>
-
-        {/* Top Badge with Floating Animation */}
-        <div className="inline-flex items-center max-w-full mb-4 sm:mb-6 px-3.5 sm:px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-400 text-xs sm:text-sm font-bold tracking-wide backdrop-blur-sm animate-float shadow-lg shadow-blue-500/10">
-          <span className="truncate">🚀 The Next Gen Hospital Management OS</span>
+        {/* Floating Live System Status Pill */}
+        <div className="inline-flex items-center gap-2 mb-6 sm:mb-8 px-4 py-1.5 rounded-full border border-blue-500/40 bg-gradient-to-r from-blue-950/60 via-indigo-950/60 to-purple-950/60 text-blue-300 text-xs sm:text-sm font-semibold tracking-wide backdrop-blur-md shadow-xl shadow-blue-500/10">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Next-Generation OPD Operating System</span>
+          <span className="hidden sm:inline text-slate-500">•</span>
+          <span className="hidden sm:inline text-indigo-300 font-bold">14,200+ Patient Tokens Processed</span>
         </div>
         
-        {/* Responsive Heading with Animated Gradient */}
-        <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tight mb-4 sm:mb-8 leading-[1.12] sm:leading-tight relative z-10">
+        {/* Grand Typography with Luminous Gradient */}
+        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white tracking-tight mb-6 sm:mb-8 leading-[1.08] sm:leading-tight">
           Zero wait times. <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 animate-gradient">
-            Infinite efficiency.
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-cyan-300">
+            Infinite clinic efficiency.
           </span>
         </h1>
         
-        {/* Description */}
-        <p className="max-w-2xl mx-auto text-sm sm:text-base md:text-xl text-slate-400 mb-8 sm:mb-12 leading-relaxed relative z-10 px-2">
-          ArogyaNext AI is the complete operating system for modern clinics. From voice-activated mobile booking to real-time TV queues, we eliminate the chaos of the waiting room.
+        {/* Rich Subtext */}
+        <p className="max-w-2xl mx-auto text-sm sm:text-lg md:text-xl text-slate-300 mb-8 sm:mb-12 leading-relaxed px-2 font-normal">
+          ArogyaNext connects patients, reception desks, doctor cabins, and pharmacies into one frictionless loop. From on-device paper OCR to real-time voice triage, we eliminate crowded waiting rooms.
         </p>
         
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-6 relative z-10 max-w-xs sm:max-w-none mx-auto w-full">
+        {/* Call to Actions */}
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-3.5 sm:gap-5 max-w-md sm:max-w-none mx-auto w-full">
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-base sm:text-lg bg-white text-slate-900 hover:bg-slate-100 transition-all shadow-xl hover:-translate-y-0.5 active:scale-95"
+            className="w-full sm:w-auto px-8 py-4 rounded-xl sm:rounded-2xl font-black text-base sm:text-lg bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 text-white shadow-2xl shadow-blue-600/40 hover:-translate-y-0.5 transition-all active:scale-95 border border-blue-400/40"
           >
-            Start Free Trial
+            Start Free Clinic Pilot
           </button>
           <button 
             onClick={() => scrollToSection('simulator')}
-            className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg border border-slate-700 hover:border-slate-500 text-white bg-slate-800/50 backdrop-blur-md transition-all active:scale-95 flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-7 py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg border-2 border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white bg-slate-900/70 backdrop-blur-md transition-all active:scale-95 flex items-center justify-center gap-2.5"
           >
-            <span>🎮 Try Live Simulator</span>
+            <span>▶ Try Interactive Simulator</span>
           </button>
         </div>
 
-        {/* --- TRUST & IMPACT METRICS RIBBON --- */}
-        <div className="mt-12 sm:mt-16 pt-8 border-t border-slate-800/80 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto relative z-10">
-          <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80">
-            <p className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">85%</p>
-            <p className="text-[11px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Wait Time Cut</p>
+        {/* --- TRUST & IMPACT METRICS RIBBON (Polished Glass Cards) --- */}
+        <div className="mt-14 sm:mt-20 pt-8 border-t border-slate-800/80 grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5 max-w-5xl mx-auto">
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-blue-500/20 shadow-lg text-left relative overflow-hidden group hover:border-blue-500/50 transition-colors">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 rounded-full blur-2xl"></div>
+            <p className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">85%</p>
+            <p className="text-xs sm:text-sm text-white font-bold mt-1">Average Wait Time Cut</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">Smooth flow from check-in to cabin</p>
           </div>
-          <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80">
-            <p className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">&lt;50ms</p>
-            <p className="text-[11px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Cloud Sync</p>
+
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-emerald-500/20 shadow-lg text-left relative overflow-hidden group hover:border-emerald-500/50 transition-colors">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full blur-2xl"></div>
+            <p className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">&lt;50ms</p>
+            <p className="text-xs sm:text-sm text-white font-bold mt-1">Cloud Real-Time Sync</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">Sub-second TV & doctor queue updates</p>
           </div>
-          <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80">
-            <p className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">6 Lang</p>
-            <p className="text-[11px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Voice Triage</p>
+
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-purple-500/20 shadow-lg text-left relative overflow-hidden group hover:border-purple-500/50 transition-colors">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-purple-500/10 rounded-full blur-2xl"></div>
+            <p className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300">6 Lang</p>
+            <p className="text-xs sm:text-sm text-white font-bold mt-1">Indian Regional Voice AI</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">Zero literacy barrier for patients</p>
           </div>
-          <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80">
-            <p className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">100%</p>
-            <p className="text-[11px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider mt-0.5">On-Device OCR</p>
+
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-amber-500/20 shadow-lg text-left relative overflow-hidden group hover:border-amber-500/50 transition-colors">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-full blur-2xl"></div>
+            <p className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-300">100%</p>
+            <p className="text-xs sm:text-sm text-white font-bold mt-1">On-Device OCR Privacy</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">Prescriptions read on device edge</p>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* --- INTERACTIVE LIVE FEATURE SIMULATOR --- */}
-      <div id="simulator" className="py-12 sm:py-16 bg-slate-950/80 border-t border-slate-800 relative scroll-mt-20">
+      <section id="simulator" className="py-16 sm:py-24 bg-gradient-to-b from-slate-950 via-slate-900/90 to-slate-950 border-t border-slate-800/80 relative scroll-mt-20 z-10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-8 sm:mb-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-2">
-              <span>⚡ Hands-on Preview</span>
+          <div className="text-center mb-10 sm:mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-black uppercase tracking-wider mb-3">
+              <span>⚡ Live Interactive Sandbox</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-white">Experience ArogyaNext In Action</h2>
-            <p className="text-slate-400 text-xs sm:text-sm mt-1 max-w-xl mx-auto">Interact with the core modules below to see how speech triage, OCR parsing, and proximity countdown alerts work in real time.</p>
+            <h2 className="text-3xl sm:text-5xl font-black text-white">Experience ArogyaNext In Action</h2>
+            <p className="text-slate-300 text-xs sm:text-base mt-2 max-w-xl mx-auto">Test out OCR extraction, multilingual regional speech triage, and smart proximity alerts live in your browser.</p>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl relative overflow-hidden">
+          <div className="bg-slate-900/90 border-2 border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl relative overflow-hidden backdrop-blur-xl">
             {/* Simulator Tabs */}
             <div className="flex border-b border-slate-800 pb-4 mb-6 gap-2 overflow-x-auto no-scrollbar">
               <button 
                 onClick={() => setActivePlaygroundTab('ocr')}
-                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
-                  activePlaygroundTab === 'ocr' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'bg-slate-800/70 text-slate-400 hover:text-white'
+                className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
+                  activePlaygroundTab === 'ocr' ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-lg shadow-indigo-600/30' : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
                 }`}
               >
                 <span>📷</span>
@@ -287,8 +321,8 @@ export default function LandingPage({ onLoginClick }) {
               </button>
               <button 
                 onClick={() => setActivePlaygroundTab('voice')}
-                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
-                  activePlaygroundTab === 'voice' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'bg-slate-800/70 text-slate-400 hover:text-white'
+                className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
+                  activePlaygroundTab === 'voice' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/30' : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
                 }`}
               >
                 <span>🎙️</span>
@@ -296,45 +330,56 @@ export default function LandingPage({ onLoginClick }) {
               </button>
               <button 
                 onClick={() => setActivePlaygroundTab('proximity')}
-                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
-                  activePlaygroundTab === 'proximity' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30' : 'bg-slate-800/70 text-slate-400 hover:text-white'
+                className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
+                  activePlaygroundTab === 'proximity' ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-600/30' : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
                 }`}
               >
                 <span>🎟️</span>
-                <span>Proximity Voice Countdown</span>
+                <span>Proximity Audio Countdown</span>
               </button>
             </div>
 
             {/* TAB 1: OCR SIMULATOR */}
             {activePlaygroundTab === 'ocr' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                <div className="bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-800">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Patient Camera Capture</span>
-                    <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-bold border border-emerald-500/20">Edge ML Processed</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+                <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Patient Camera Capture</span>
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">Google ML Kit Ready</span>
+                    </div>
+                    <div className="border-2 border-dashed border-indigo-500/50 rounded-2xl p-5 bg-gradient-to-b from-indigo-950/20 to-slate-950 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                      <div className="w-12 h-12 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-2xl mb-2">
+                        📄
+                      </div>
+                      <p className="font-bold text-white text-sm">Paper Slip #Rx-8921</p>
+                      <p className="text-[11px] text-slate-400 mt-1">Handwritten notes detected • Edge processing</p>
+                      <div className="w-full h-1 bg-indigo-500/30 rounded-full mt-3 overflow-hidden">
+                        <div className="h-full bg-indigo-400 animate-pulse w-full"></div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="border-2 border-dashed border-indigo-500/40 rounded-xl p-4 bg-indigo-950/20 flex flex-col items-center justify-center text-center">
-                    <span className="text-4xl mb-2">📄</span>
-                    <p className="font-bold text-white text-sm">Sample Paper Slip #Rx-8921</p>
-                    <p className="text-[11px] text-slate-400 mt-1">Simulated camera input • Privacy protected</p>
-                  </div>
+                  <p className="text-[11px] text-slate-500 mt-3 text-center">Patient photographs prescription at home; digitized before hospital arrival.</p>
                 </div>
 
-                <div className="bg-slate-950 p-4 sm:p-5 rounded-2xl border border-indigo-500/30 flex flex-col justify-between">
+                <div className="bg-slate-950 p-5 rounded-2xl border border-indigo-500/40 flex flex-col justify-between shadow-lg shadow-indigo-500/5">
                   <div>
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between mb-2.5">
                       <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-1.5">
                         <span>✨</span> Extracted Digital Text
                       </span>
-                      <span className="text-[10px] text-slate-400 font-mono">0.12s latency</span>
+                      <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-500/10 px-2 py-0.5 rounded">0.12s latency</span>
                     </div>
-                    <div className="bg-slate-900 rounded-xl p-3 font-mono text-xs text-slate-200 border border-slate-800 whitespace-pre-wrap leading-relaxed">
+                    <div className="bg-slate-900/90 rounded-xl p-3.5 font-mono text-xs text-slate-200 border border-slate-800 whitespace-pre-wrap leading-relaxed shadow-inner">
                       {"[Prior Prescription Notes]:\n1. Tab. Dolo 650mg - 1x BD (3 Days)\n2. Cap. Amoxicillin 500mg - 1x TDS\n3. Syrup Ascoril LS - 5ml at bedtime\nDiagnosis: Acute bronchitis with mild fever"}
                     </div>
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-3 flex items-center gap-1.5">
-                    <span className="text-emerald-400">✓</span> Auto-syncs directly to attending doctor's cabin screen
-                  </p>
+                  <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                    <span className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
+                      <span>✓</span> Ready in Doctor Cabin
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-mono">Status: Synced</span>
+                  </div>
                 </div>
               </div>
             )}
@@ -342,20 +387,20 @@ export default function LandingPage({ onLoginClick }) {
             {/* TAB 2: MULTI-LANGUAGE VOICE SIMULATOR */}
             {activePlaygroundTab === 'voice' && (
               <div className="space-y-4">
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Select a regional Indian language to hear live voice triage:</p>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Tap a regional language to hear audio voice guidance:</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
                   {sampleLanguages.map((lang) => (
                     <button
                       key={lang.name}
                       onClick={() => setTestLanguage(lang.name)}
-                      className={`p-2.5 rounded-xl text-left border transition-all ${
+                      className={`p-3 rounded-xl text-left border transition-all ${
                         testLanguage === lang.name 
-                          ? 'bg-blue-600/20 border-blue-500 text-white shadow-md shadow-blue-500/10' 
-                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                          ? 'bg-gradient-to-b from-blue-900/50 to-indigo-950/80 border-blue-400 text-white shadow-lg shadow-blue-500/20' 
+                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
                       }`}
                     >
-                      <p className="text-xs font-bold">{lang.native}</p>
-                      <p className="text-[10px] text-slate-500">{lang.name}</p>
+                      <p className="text-sm font-black">{lang.native}</p>
+                      <p className="text-[10px] text-slate-400">{lang.name}</p>
                     </button>
                   ))}
                 </div>
@@ -363,16 +408,20 @@ export default function LandingPage({ onLoginClick }) {
                 {(() => {
                   const currentSample = sampleLanguages.find(l => l.name === testLanguage) || sampleLanguages[0];
                   return (
-                    <div className="bg-slate-950 p-4 sm:p-5 rounded-2xl border border-blue-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="bg-slate-950 p-5 rounded-2xl border border-blue-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
                       <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400">Recognized Patient Speech:</span>
-                        <p className="text-base sm:text-lg font-bold text-white mt-1 leading-snug">"{currentSample.text}"</p>
-                        <p className="text-xs text-slate-400 mt-1">Mapped Specialist: <span className="text-emerald-400 font-bold">General Medicine / Pulmonology</span></p>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+                          <span>🎙️</span> Recognized Patient Speech ({currentSample.name}):
+                        </span>
+                        <p className="text-base sm:text-xl font-black text-white mt-1 leading-snug">"{currentSample.text}"</p>
+                        <p className="text-xs text-slate-400 mt-1.5">
+                          AI Mapped Cabin: <span className="text-emerald-400 font-bold">General Medicine / Pulmonology</span>
+                        </p>
                       </div>
                       <button
                         onClick={() => handleTestSpeech(currentSample.voice)}
-                        className={`px-5 py-3 rounded-xl font-bold text-xs sm:text-sm text-white flex items-center gap-2 flex-shrink-0 transition-all ${
-                          isPlayingAudio ? 'bg-amber-600 animate-pulse' : 'bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-600/20 active:scale-95'
+                        className={`px-5 py-3.5 rounded-xl font-black text-xs sm:text-sm text-white flex items-center gap-2 flex-shrink-0 transition-all ${
+                          isPlayingAudio ? 'bg-amber-600 animate-pulse' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-600/30 active:scale-95'
                         }`}
                       >
                         <span>🔊</span>
@@ -387,17 +436,17 @@ export default function LandingPage({ onLoginClick }) {
             {/* TAB 3: PROXIMITY SIMULATOR */}
             {activePlaygroundTab === 'proximity' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                <div className="bg-slate-950 p-4 sm:p-5 rounded-2xl border border-slate-800">
+                <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">
-                    Simulate Patients Ahead: <span className="text-emerald-400 font-mono text-base font-black">{testSpotsAway}</span>
+                    Simulate Patients Ahead: <span className="text-emerald-400 font-mono text-lg font-black">{testSpotsAway}</span>
                   </label>
                   <input 
                     type="range" min="0" max="4" value={testSpotsAway} 
                     onChange={(e) => setTestSpotsAway(parseInt(e.target.value))} 
-                    className="w-full accent-emerald-500 cursor-pointer"
+                    className="w-full accent-emerald-500 cursor-pointer h-2 bg-slate-800 rounded-lg"
                   />
-                  <div className="flex justify-between text-[10px] text-slate-500 mt-2 font-mono">
-                    <span>0 (Your Turn!)</span>
+                  <div className="flex justify-between text-[11px] text-slate-400 mt-2 font-mono">
+                    <span className="text-emerald-400 font-bold">0 (Your Turn!)</span>
                     <span>1 spot</span>
                     <span>2 spots</span>
                     <span>3 spots</span>
@@ -405,13 +454,16 @@ export default function LandingPage({ onLoginClick }) {
                   </div>
                 </div>
 
-                <div className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+                <div className={`p-5 rounded-2xl border transition-all ${
                   testSpotsAway === 0 
-                    ? 'bg-emerald-950/40 border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.25)]' 
+                    ? 'bg-emerald-950/40 border-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.25)]' 
                     : 'bg-slate-950 border-slate-800'
                 }`}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">Smartphone Alert Preview</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                      Smartphone Alert Preview
+                    </span>
                     <span className="text-[10px] text-slate-400 font-mono">Est. Wait: ~{testSpotsAway * 5} mins</span>
                   </div>
                   <h4 className="text-lg font-black text-white">
@@ -419,16 +471,16 @@ export default function LandingPage({ onLoginClick }) {
                   </h4>
                   <p className="text-xs text-slate-300 mt-1">
                     {testSpotsAway === 0 
-                      ? 'Doctor is ready. Proceed directly to the examination desk.' 
-                      : 'Please make your way toward the waiting lobby.'}
+                      ? 'Doctor is waiting for consultation. Proceed directly to the examination cabin.' 
+                      : 'Please make your way towards the hospital waiting lounge.'}
                   </p>
-                  <div className="mt-3 flex gap-2">
+                  <div className="mt-4 flex gap-2">
                     <button 
                       onClick={() => handleTestSpeech(testSpotsAway === 0 ? "Token number S 14, please step into Cabin 1 now." : `Token S 14, you are ${testSpotsAway} spots away. Please head towards the lobby.`)}
-                      className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors flex items-center gap-1.5"
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs transition-colors flex items-center gap-1.5 shadow-md shadow-emerald-600/20 active:scale-95"
                     >
                       <span>🔊</span>
-                      <span>Speak Alert</span>
+                      <span>Speak Notification Aloud</span>
                     </button>
                   </div>
                 </div>
@@ -436,202 +488,290 @@ export default function LandingPage({ onLoginClick }) {
             )}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* --- UPGRADED FEATURES GRID (With OCR, Multi-Language & Proximity) --- */}
-      <div id="features" className="bg-slate-950 py-16 sm:py-24 md:py-32 border-t border-slate-800 scroll-mt-20">
+      {/* --- PLATFORM FEATURES SECTION (Rich Color Palette & Custom Vector Emblems) --- */}
+      <section id="features" className="bg-slate-950 py-16 sm:py-24 border-t border-slate-800/80 scroll-mt-20 z-10 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12 sm:mb-20">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold uppercase tracking-wider mb-3">
-              <span>✨ Version 2.0 Architectural Upgrades</span>
+          <div className="text-center mb-12 sm:mb-16">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-500/30 text-blue-400 text-xs font-black uppercase tracking-wider mb-3">
+              <span>💎 Enterprise Clinical Capabilities</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-3 sm:mb-6">Everything your hospital needs.</h2>
-            <p className="text-slate-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">From paper prescription OCR scanning to multi-lingual voice triage, ArogyaNext unifies patients and clinicians in one frictionless loop.</p>
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-white">Everything your hospital needs.</h2>
+            <p className="text-slate-300 text-sm sm:text-lg max-w-2xl mx-auto mt-2">Engineered from ground up to replace fragmented paper systems with synchronized intelligence.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
             {/* Feature 1: On-Device Prescription OCR */}
-            <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl sm:rounded-3xl hover:border-indigo-500/50 transition-colors group">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">📷</div>
-              <div className="inline-block px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 text-[10px] font-black uppercase tracking-wider mb-2 border border-indigo-500/20">Google ML Kit</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">On-Device Prescription OCR</h3>
-              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Patients take a photo of old paper prescriptions. Privacy-focused on-device text recognition instantly extracts doctor notes, previous medications, and reported symptoms directly for the doctor to review.</p>
+            <div className="p-7 rounded-3xl bg-gradient-to-b from-slate-900/90 to-slate-950 border border-indigo-500/30 hover:border-indigo-400/70 transition-all group shadow-xl hover:-translate-y-1 relative overflow-hidden">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-cyan-400 flex items-center justify-center text-white text-2xl mb-5 shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform">
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-indigo-500/10 text-indigo-300 text-[10px] font-black uppercase tracking-wider mb-2.5 border border-indigo-500/30">Google ML Kit Edge</div>
+              <h3 className="text-xl font-black text-white mb-2">On-Device Paper OCR</h3>
+              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">Patients take a photo of previous physical prescriptions. Local computer-vision models digitize handwritten notes, dosage history, and symptoms directly to the doctor's cabin screen.</p>
             </div>
 
             {/* Feature 2: Multi-Language Voice AI */}
-            <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl sm:rounded-3xl hover:border-blue-500/50 transition-colors group">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">🎙️</div>
-              <div className="inline-block px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 text-[10px] font-black uppercase tracking-wider mb-2 border border-blue-500/20">6 Regional Languages</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Multi-Language Voice AI</h3>
-              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Patients speak in English, Hindi (हिन्दी), Tamil (தமிழ்), Telugu (తెలుగు), Marathi (मराठी), or Bengali (বাংলা). High-accuracy speech recognition eliminates the digital divide for elderly and regional citizens.</p>
+            <div className="p-7 rounded-3xl bg-gradient-to-b from-slate-900/90 to-slate-950 border border-blue-500/30 hover:border-blue-400/70 transition-all group shadow-xl hover:-translate-y-1 relative overflow-hidden">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-2xl mb-5 shadow-lg shadow-blue-500/25 group-hover:scale-105 transition-transform">
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-blue-500/10 text-blue-300 text-[10px] font-black uppercase tracking-wider mb-2.5 border border-blue-500/30">6 Indian Languages</div>
+              <h3 className="text-xl font-black text-white mb-2">Native Voice Intake</h3>
+              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">Patients describe their symptoms in English, Hindi, Tamil, Telugu, Marathi, or Bengali. Voice AI converts speech to clinical symptoms, eliminating literacy hurdles for elderly citizens.</p>
             </div>
 
             {/* Feature 3: Visual & Audio AI Symptom Triage */}
-            <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl sm:rounded-3xl hover:border-purple-500/50 transition-colors group">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-purple-500/10 text-purple-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">🧠</div>
-              <div className="inline-block px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 text-[10px] font-black uppercase tracking-wider mb-2 border border-purple-500/20">Visual Body Map & Audio</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Visual & Audio AI Triage</h3>
-              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Interactive body map regions (Head, Chest, Digestion, Limbs), universal emoji cards, color-coded pain scale, and Text-to-Speech audio guidance (`Listen 🔊`) ensure even illiterate patients select the right specialist.</p>
+            <div className="p-7 rounded-3xl bg-gradient-to-b from-slate-900/90 to-slate-950 border border-purple-500/30 hover:border-purple-400/70 transition-all group shadow-xl hover:-translate-y-1 relative overflow-hidden">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-white text-2xl mb-5 shadow-lg shadow-purple-500/25 group-hover:scale-105 transition-transform">
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-purple-500/10 text-purple-300 text-[10px] font-black uppercase tracking-wider mb-2.5 border border-purple-500/30">Visual Body Map</div>
+              <h3 className="text-xl font-black text-white mb-2">Visual & Audio AI Triage</h3>
+              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">Interactive body map areas, color-coded pain severity meters, and voice guidance help patients choose the appropriate specialty clinic without queueing at reception.</p>
             </div>
 
             {/* Feature 4: Live Queue Proximity Alerts */}
-            <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl sm:rounded-3xl hover:border-emerald-500/50 transition-colors group">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">🎟️</div>
-              <div className="inline-block px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 text-[10px] font-black uppercase tracking-wider mb-2 border border-emerald-500/20">0–4 Spots Away</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Live Proximity Voice Alerts</h3>
-              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Patients receive live estimated wait times (~5 min per token) and automated voice proximity callouts when 4, 3, 2, 1, or 0 spots away with interactive check-in (`[ Proceed ]` / `[ Cancel ]`).</p>
+            <div className="p-7 rounded-3xl bg-gradient-to-b from-slate-900/90 to-slate-950 border border-emerald-500/30 hover:border-emerald-400/70 transition-all group shadow-xl hover:-translate-y-1 relative overflow-hidden">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white text-2xl mb-5 shadow-lg shadow-emerald-500/25 group-hover:scale-105 transition-transform">
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 text-[10px] font-black uppercase tracking-wider mb-2.5 border border-emerald-500/30">Zero Lobby Crowding</div>
+              <h3 className="text-xl font-black text-white mb-2">Smart Proximity Alerts</h3>
+              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">Patients receive real-time audio callouts on their phones when 4, 3, 2, or 1 spot away, allowing them to relax outside or in the cafeteria until their turn arrives.</p>
             </div>
 
             {/* Feature 5: Senior-Friendly Material 3 Design */}
-            <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl sm:rounded-3xl hover:border-orange-500/50 transition-colors group">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-orange-500/10 text-orange-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">👵</div>
-              <div className="inline-block px-2 py-0.5 rounded bg-orange-500/10 text-orange-300 text-[10px] font-black uppercase tracking-wider mb-2 border border-orange-500/20">Universal Accessibility</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Senior-Friendly Patient UI</h3>
-              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Large high-contrast touch targets (≥48dp), rounded Material 3 cards, an interactive 4-step onboarding walkthrough, and instant 1-tap demo check-ins make the app effortless for all generations.</p>
+            <div className="p-7 rounded-3xl bg-gradient-to-b from-slate-900/90 to-slate-950 border border-amber-500/30 hover:border-amber-400/70 transition-all group shadow-xl hover:-translate-y-1 relative overflow-hidden">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white text-2xl mb-5 shadow-lg shadow-amber-500/25 group-hover:scale-105 transition-transform">
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-amber-500/10 text-amber-300 text-[10px] font-black uppercase tracking-wider mb-2.5 border border-amber-500/30">Universal Access</div>
+              <h3 className="text-xl font-black text-white mb-2">Senior-First Accessibility</h3>
+              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">High-contrast typography, large touch targets, color-safe badges, and 1-tap voice readouts designed for ease of use across all age groups.</p>
             </div>
 
             {/* Feature 6: Voice-Enabled TV Signage & Analytics */}
-            <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl sm:rounded-3xl hover:border-pink-500/50 transition-colors group">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-pink-500/10 text-pink-400 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-5 sm:mb-6 group-hover:scale-110 transition-transform">📺</div>
-              <div className="inline-block px-2 py-0.5 rounded bg-pink-500/10 text-pink-300 text-[10px] font-black uppercase tracking-wider mb-2 border border-pink-500/20">Broadcast Displays</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Smart TV Lobby Signage</h3>
-              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">Smart TVs in hospital waiting rooms display neon live queues, continuous scrolling notice tickers, and spoken token announcements in real time as doctors click 'Call In'.</p>
+            <div className="p-7 rounded-3xl bg-gradient-to-b from-slate-900/90 to-slate-950 border border-pink-500/30 hover:border-pink-400/70 transition-all group shadow-xl hover:-translate-y-1 relative overflow-hidden">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-pink-600 to-rose-500 flex items-center justify-center text-white text-2xl mb-5 shadow-lg shadow-pink-500/25 group-hover:scale-105 transition-transform">
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-pink-500/10 text-pink-300 text-[10px] font-black uppercase tracking-wider mb-2.5 border border-pink-500/30">Broadcast Lobby Signage</div>
+              <h3 className="text-xl font-black text-white mb-2">Smart TV Audio Signage</h3>
+              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">Turns waiting room TVs into intelligent signage with clinic chimes, multi-doctor queue boards, and marquee announcements synced in real time.</p>
             </div>
 
-            {/* FEATURE 7: E-Pharmacy Sync */}
-            <div className="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl sm:rounded-3xl hover:border-teal-500/50 transition-all group md:col-span-2 lg:col-span-3 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-8 relative overflow-hidden">
-              <div className="absolute -right-20 -top-20 w-64 h-64 bg-teal-500/10 blur-[80px] rounded-full pointer-events-none"></div>
-              
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-teal-500/10 text-teal-400 rounded-2xl sm:rounded-3xl flex items-center justify-center text-3xl sm:text-4xl flex-shrink-0 group-hover:scale-110 transition-transform shadow-[0_0_30px_rgba(20,184,166,0.2)]">💊</div>
-              
+            {/* Feature 7: E-Pharmacy Sync (Full Width Banner) */}
+            <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-r from-teal-950/40 via-slate-900 to-indigo-950/40 border-2 border-teal-500/40 md:col-span-2 lg:col-span-3 flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8 shadow-2xl relative overflow-hidden">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-teal-500 to-emerald-400 flex items-center justify-center text-white text-3xl sm:text-4xl shadow-xl shadow-teal-500/30 flex-shrink-0">
+                💊
+              </div>
               <div>
-                <div className="inline-block px-2.5 py-0.5 sm:px-3 sm:py-1 bg-teal-500/20 text-teal-300 text-[10px] sm:text-xs font-black tracking-widest uppercase rounded-md mb-2 sm:mb-3 border border-teal-500/30">Direct In-House Revenue</div>
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white mb-2 sm:mb-3">Instant E-Pharmacy Routing & OCR Sync</h3>
-                <p className="text-slate-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-4xl">Doctors review the patient's scanned paper prescription, generate a digital prescription, and with one click send the medicine order to the in-house pharmacy counter. Medicines are dispensed before the patient walks in.</p>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-teal-500/20 text-teal-300 text-[10px] sm:text-xs font-black tracking-widest uppercase mb-2 border border-teal-500/40">
+                  Instant Revenue Channel
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-black text-white mb-2">Direct E-Pharmacy Dispatch & Packing</h3>
+                <p className="text-slate-300 text-xs sm:text-base leading-relaxed max-w-4xl">
+                  Doctors complete consultations and sync digital prescriptions with one click to the hospital pharmacy counter. Medication packets are prepared before the patient reaches the billing desk.
+                </p>
               </div>
             </div>
 
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* --- HOW IT WORKS SECTION --- */}
-      <div id="how-it-works" className="py-16 sm:py-24 md:py-32 scroll-mt-20 border-t border-slate-800 bg-slate-900">
+      {/* --- HOW IT WORKS SECTION (Polished Process Flow with Gradient Badges) --- */}
+      <section id="how-it-works" className="py-16 sm:py-24 border-t border-slate-800/80 bg-slate-900/60 scroll-mt-20 z-10 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12 sm:mb-20">
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-3 sm:mb-6">How ArogyaNext flows.</h2>
-            <p className="text-slate-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">From paper photo or voice input to the doctor's desk and hospital pharmacy.</p>
+          <div className="text-center mb-14 sm:mb-20">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-black uppercase tracking-wider mb-3">
+              <span>🔄 Frictionless End-to-End Loop</span>
+            </div>
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-white">How ArogyaNext flows.</h2>
+            <p className="text-slate-300 text-sm sm:text-lg max-w-2xl mx-auto mt-2">A cohesive patient journey connecting homes, waiting lobbies, doctors, and pharmacy counters.</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 relative">
-            <div className="hidden md:block absolute top-12 left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-blue-900 via-blue-500/50 to-purple-900 z-0"></div>
-
-            <div className="relative z-10 flex flex-col items-center text-center p-4 rounded-2xl bg-slate-950/40 md:bg-transparent border border-slate-800 md:border-none">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-950 border-4 border-slate-800 group-hover:border-indigo-500 rounded-full flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-6 shadow-xl transition-colors">1️⃣</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Scan & Voice Book</h3>
-              <p className="text-slate-400 text-xs sm:text-sm">Patient speaks in their native language or photographs an old prescription with ML Kit OCR.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+            
+            {/* Step 1 */}
+            <div className="relative p-6 sm:p-7 rounded-3xl bg-slate-950 border border-indigo-500/30 shadow-xl flex flex-col justify-between hover:border-indigo-400 transition-all group">
+              <div>
+                <div className="flex items-center justify-between mb-5">
+                  <span className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/40 text-indigo-400 font-mono font-black text-sm flex items-center justify-center shadow-inner">
+                    01
+                  </span>
+                  <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Patient Intake</span>
+                </div>
+                <h3 className="text-lg sm:text-xl font-black text-white mb-2">Scan & Voice Book</h3>
+                <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                  Patient speaks in their native regional dialect or captures previous prescriptions using on-device ML Kit OCR.
+                </p>
+              </div>
+              <div className="mt-6 pt-3 border-t border-slate-900 text-[11px] font-mono text-indigo-300">
+                • Edge Camera Processing
+              </div>
             </div>
 
-            <div className="relative z-10 flex flex-col items-center text-center p-4 rounded-2xl bg-slate-950/40 md:bg-transparent border border-slate-800 md:border-none">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-950 border-4 border-slate-800 group-hover:border-purple-500 rounded-full flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-6 shadow-xl transition-colors">2️⃣</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Visual AI Triage</h3>
-              <p className="text-slate-400 text-xs sm:text-sm">Universal body map and emoji pain scale match specialist. Live token queue is generated.</p>
+            {/* Step 2 */}
+            <div className="relative p-6 sm:p-7 rounded-3xl bg-slate-950 border border-purple-500/30 shadow-xl flex flex-col justify-between hover:border-purple-400 transition-all group">
+              <div>
+                <div className="flex items-center justify-between mb-5">
+                  <span className="w-10 h-10 rounded-xl bg-purple-600/20 border border-purple-500/40 text-purple-400 font-mono font-black text-sm flex items-center justify-center shadow-inner">
+                    02
+                  </span>
+                  <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">Specialty Routing</span>
+                </div>
+                <h3 className="text-lg sm:text-xl font-black text-white mb-2">Visual AI Triage</h3>
+                <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                  Interactive body map & pain meters match the right specialist cabin. A live queue token (e.g. S-14) is instantly generated.
+                </p>
+              </div>
+              <div className="mt-6 pt-3 border-t border-slate-900 text-[11px] font-mono text-purple-300">
+                • Priority Emergency Tagging
+              </div>
             </div>
 
-            <div className="relative z-10 flex flex-col items-center text-center p-4 rounded-2xl bg-slate-950/40 md:bg-transparent border border-slate-800 md:border-none">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-950 border-4 border-slate-800 group-hover:border-blue-500 rounded-full flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-6 shadow-xl transition-colors">3️⃣</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Proximity Alert</h3>
-              <p className="text-slate-400 text-xs sm:text-sm">Phone speaks alert at 0–4 spots away. Waiting TV lobby announces token aloud.</p>
+            {/* Step 3 */}
+            <div className="relative p-6 sm:p-7 rounded-3xl bg-slate-950 border border-emerald-500/30 shadow-xl flex flex-col justify-between hover:border-emerald-400 transition-all group">
+              <div>
+                <div className="flex items-center justify-between mb-5">
+                  <span className="w-10 h-10 rounded-xl bg-emerald-600/20 border border-emerald-500/40 text-emerald-400 font-mono font-black text-sm flex items-center justify-center shadow-inner">
+                    03
+                  </span>
+                  <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Queue Notice</span>
+                </div>
+                <h3 className="text-lg sm:text-xl font-black text-white mb-2">Proximity Voice Alert</h3>
+                <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                  Patient's phone provides spoken callouts at 2 spots away. The hospital lobby TV chimes token announcements aloud.
+                </p>
+              </div>
+              <div className="mt-6 pt-3 border-t border-slate-900 text-[11px] font-mono text-emerald-300">
+                • Zero Waiting Lobby Stress
+              </div>
             </div>
 
-            <div className="relative z-10 flex flex-col items-center text-center p-4 rounded-2xl bg-slate-950/40 md:bg-transparent border border-slate-800 md:border-none">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-950 border-4 border-slate-800 group-hover:border-emerald-500 rounded-full flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-6 shadow-xl transition-colors">4️⃣</div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Consult & Dispense</h3>
-              <p className="text-slate-400 text-xs sm:text-sm">Doctor checks scanned notes, e-signs prescription; hospital pharmacy packs medicines instantly.</p>
+            {/* Step 4 */}
+            <div className="relative p-6 sm:p-7 rounded-3xl bg-slate-950 border border-cyan-500/30 shadow-xl flex flex-col justify-between hover:border-cyan-400 transition-all group">
+              <div>
+                <div className="flex items-center justify-between mb-5">
+                  <span className="w-10 h-10 rounded-xl bg-cyan-600/20 border border-cyan-500/40 text-cyan-400 font-mono font-black text-sm flex items-center justify-center shadow-inner">
+                    04
+                  </span>
+                  <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">Cabin & Pharmacy</span>
+                </div>
+                <h3 className="text-lg sm:text-xl font-black text-white mb-2">Consult & Dispense</h3>
+                <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                  Doctor inspects extracted OCR notes, signs electronic Rx, and hospital pharmacy packs medicine for immediate pickup.
+                </p>
+              </div>
+              <div className="mt-6 pt-3 border-t border-slate-900 text-[11px] font-mono text-cyan-300">
+                • Integrated Revenue Loop
+              </div>
             </div>
+
           </div>
         </div>
-      </div>
+      </section>
 
       {/* --- PRICING SECTION --- */}
-      <div id="pricing" className="py-16 sm:py-24 md:py-32 scroll-mt-20 border-t border-slate-800 bg-slate-950">
+      <section id="pricing" className="py-16 sm:py-24 border-t border-slate-800/80 bg-slate-950 scroll-mt-20 z-10 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10 sm:mb-16">
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-3 sm:mb-6">Simple, scalable pricing.</h2>
-            <p className="text-slate-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">No hidden installation fees. Pay only for the size of your workforce.</p>
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-5xl font-black text-white">Transparent clinic pricing.</h2>
+            <p className="text-slate-300 text-sm sm:text-lg max-w-xl mx-auto mt-2">Zero setup hardware overhead. Runs on existing phones, tablets, and smart TVs.</p>
           </div>
 
           <div className="max-w-md mx-auto relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-[2rem] sm:rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-[2.5rem] blur-xl opacity-35 group-hover:opacity-60 transition duration-1000"></div>
             
-            <div className="relative bg-slate-900 border border-slate-700 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-center py-2.5 sm:py-3">
-                <p className="text-white font-black text-xs sm:text-sm tracking-widest uppercase animate-pulse">
-                  🚀 First 50 Clinics: 6 Months Free
+            <div className="relative bg-slate-900 border-2 border-slate-700/80 rounded-3xl overflow-hidden shadow-2xl">
+              <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-center py-3">
+                <p className="text-white font-black text-xs sm:text-sm tracking-widest uppercase">
+                  ⭐ First 50 Clinics: 6-Month Pilot Included
                 </p>
               </div>
 
-              <div className="p-6 sm:p-8">
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">Clinic Pro Plan</h3>
-                <p className="text-slate-400 text-xs sm:text-sm mb-5 sm:mb-6">Full access to the entire ArogyaNext ecosystem.</p>
+              <div className="p-7 sm:p-9">
+                <h3 className="text-2xl font-black text-white mb-1">Clinic Pro Plan</h3>
+                <p className="text-slate-400 text-xs sm:text-sm mb-6">Complete access to the entire ArogyaNext ecosystem.</p>
                 
-                <div className="mb-5 sm:mb-6">
+                <div className="mb-6 flex items-baseline gap-2">
                   <span className="text-4xl sm:text-5xl font-black text-white">₹999</span>
-                  <span className="text-slate-400 text-sm font-medium"> / month base</span>
+                  <span className="text-slate-400 text-sm font-semibold">/ month base</span>
                 </div>
                 
-                <div className="bg-slate-800/60 rounded-xl p-3 sm:p-4 mb-6 sm:mb-8 border border-slate-700/50 inline-block">
-                  <span className="text-blue-400 font-bold text-sm sm:text-base tracking-wide">+ ₹500 / month</span>
-                  <span className="text-slate-400 text-xs sm:text-sm ml-2">per active doctor</span>
+                <div className="bg-slate-950/80 rounded-xl p-3.5 mb-7 border border-slate-800 flex items-center justify-between">
+                  <span className="text-blue-400 font-bold text-sm">+ ₹500 / month</span>
+                  <span className="text-slate-400 text-xs font-medium">per active doctor cabin</span>
                 </div>
 
-                <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8 text-slate-300 text-xs sm:text-sm font-medium">
-                  <li className="flex items-center"><span className="text-emerald-500 mr-2.5 text-base sm:text-lg">✓</span> Unlimited Patient Bookings</li>
-                  <li className="flex items-center"><span className="text-emerald-500 mr-2.5 text-base sm:text-lg">✓</span> Unlimited Support Staff Logins</li>
-                  <li className="flex items-center"><span className="text-emerald-500 mr-2.5 text-base sm:text-lg">✓</span> Voice-Enabled TV Signage</li>
-                  <li className="flex items-center"><span className="text-emerald-500 mr-2.5 text-base sm:text-lg">✓</span> Director Analytics Dashboard</li>
-                  <li className="flex items-center"><span className="text-emerald-500 mr-2.5 text-base sm:text-lg">✓</span> AI Triage & Voice Assistant</li>
+                <ul className="space-y-3.5 mb-8 text-slate-200 text-xs sm:text-sm font-medium">
+                  <li className="flex items-center"><span className="text-emerald-400 mr-2.5 text-base font-bold">✓</span> Unlimited Patient Token Bookings</li>
+                  <li className="flex items-center"><span className="text-emerald-400 mr-2.5 text-base font-bold">✓</span> Doctor Cabin Workspace & Smart Pad</li>
+                  <li className="flex items-center"><span className="text-emerald-400 mr-2.5 text-base font-bold">✓</span> On-Device Google ML Kit Paper Rx OCR</li>
+                  <li className="flex items-center"><span className="text-emerald-400 mr-2.5 text-base font-bold">✓</span> Voice-Enabled Lobby Smart TV Signage</li>
+                  <li className="flex items-center"><span className="text-emerald-400 mr-2.5 text-base font-bold">✓</span> 6-Language Regional Voice Triage</li>
+                  <li className="flex items-center"><span className="text-emerald-400 mr-2.5 text-base font-bold">✓</span> E-Pharmacy Queue & Dispense Sync</li>
                 </ul>
 
                 <button 
                   onClick={() => setIsModalOpen(true)}
-                  className="w-full bg-white hover:bg-slate-100 text-slate-900 font-black py-3.5 sm:py-4 rounded-xl transition-all shadow-md active:scale-98"
+                  className="w-full py-4 rounded-xl font-black text-sm text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 transition-all shadow-xl shadow-blue-500/25 active:scale-98"
                 >
-                  Claim Your 6-Month Pilot
+                  Start Your 6-Month Pilot
                 </button>
-                <p className="text-center text-slate-500 text-[11px] sm:text-xs mt-3 sm:mt-4 font-medium">
-                  No credit card required for pilot setup.
+                <p className="text-center text-slate-500 text-[11px] mt-3 font-medium">
+                  No credit card required • Dedicated setup engineer provided
                 </p>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* --- CTA SECTION --- */}
-      <div className="py-16 sm:py-24 md:py-32 relative overflow-hidden border-t border-slate-800">
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-900 to-blue-950/20"></div>
+      {/* --- BOTTOM CTA --- */}
+      <section className="py-20 sm:py-28 relative overflow-hidden border-t border-slate-800 bg-gradient-to-b from-slate-950 via-slate-900 to-blue-950/30 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
-          <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-4 sm:mb-8">Ready to upgrade your hospital?</h2>
-          <p className="text-sm sm:text-lg md:text-xl text-slate-400 mb-8 sm:mb-10 max-w-2xl mx-auto">Join the network of modern clinics eliminating wait times and boosting patient satisfaction.</p>
+          <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-white mb-4 sm:mb-6">Ready to modernize your clinic?</h2>
+          <p className="text-slate-300 text-sm sm:text-lg mb-8 sm:mb-10 max-w-xl mx-auto">Eliminate waiting room chaos and empower your staff with ArogyaNext today.</p>
           <button 
             onClick={() => setIsModalOpen(true)} 
-            className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 rounded-xl sm:rounded-2xl font-black text-base sm:text-xl bg-blue-600 hover:bg-blue-500 text-white shadow-2xl shadow-blue-600/30 transition-all active:scale-95"
+            className="px-9 py-4 sm:py-5 rounded-2xl font-black text-base sm:text-lg bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 text-white shadow-2xl shadow-blue-600/35 transition-all active:scale-95 border border-blue-400/40"
           >
-            Book a Full System Demo
+            Schedule a Full Hospital Demo
           </button>
         </div>
-      </div>
+      </section>
 
       {/* --- FOOTER --- */}
-      <footer className="border-t border-slate-800 bg-slate-950 py-8 sm:py-12">
+      <footer className="border-t border-slate-800/80 bg-slate-950 py-10 sm:py-12 z-10 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
-          <div className="text-lg sm:text-xl font-black tracking-wider text-slate-400">
-            Arogya<span className="text-blue-500">Next</span>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-xs">
+              ✚
+            </div>
+            <div className="text-lg font-black text-white">
+              Arogya<span className="text-blue-400">Next</span>
+            </div>
           </div>
-          <div className="text-slate-500 text-xs sm:text-sm font-medium">
-            © {new Date().getFullYear()} ArogyaNext Technologies. All rights reserved.
+          <div className="text-slate-400 text-xs font-medium">
+            © {new Date().getFullYear()} ArogyaNext Technologies. All rights reserved. • Built for Indian Healthcare
           </div>
         </div>
       </footer>
