@@ -1,6 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
 import { db } from './firebase';
 import { collection, query, where, onSnapshot, doc, updateDoc, setDoc } from 'firebase/firestore';
+import { 
+  Stethoscope, 
+  Scan, 
+  Clock, 
+  Calendar, 
+  AlertCircle, 
+  CheckCircle2, 
+  ChevronRight, 
+  User, 
+  Pill, 
+  Sparkles, 
+  FileText,
+  ClipboardList
+} from 'lucide-react';
 
 export default function DoctorPanel({ hospitalId, doctorName }) {
   const [waitingPatients, setWaitingPatients] = useState([]);
@@ -217,15 +231,17 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
           <div className="bg-slate-900 p-1 rounded-xl flex border border-slate-700">
             <button 
               onClick={() => handleStatusChange("Active")}
-              className={`flex-1 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${currentStatus === "Active" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.1)]" : "text-slate-500 hover:text-slate-300"}`}
+              className={`flex-1 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 ${currentStatus === "Active" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.1)]" : "text-slate-500 hover:text-slate-300"}`}
             >
-              🟢 Active
+              <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span>Active</span>
             </button>
             <button 
               onClick={() => handleStatusChange("Away")}
-              className={`flex-1 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${currentStatus === "Away" ? "bg-amber-500/20 text-amber-400 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.1)]" : "text-slate-500 hover:text-slate-300"}`}
+              className={`flex-1 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 ${currentStatus === "Away" ? "bg-amber-500/20 text-amber-400 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.1)]" : "text-slate-500 hover:text-slate-300"}`}
             >
-              ☕ Away
+              <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+              <span>Away</span>
             </button>
           </div>
         </div>
@@ -255,8 +271,9 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
               Waiting Queue ({waitingPatients.length})
             </h3>
             {waitingPatients.some(p => p.isEmergency) && (
-              <span className="text-[10px] font-black text-red-400 bg-red-500/10 border border-red-500/30 px-2 py-0.5 rounded-full animate-pulse">
-                🚨 Emergency In Queue
+              <span className="text-[10px] font-black text-rose-400 bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+                <AlertCircle className="w-3 h-3 text-rose-400" />
+                <span>Emergency In Queue</span>
               </span>
             )}
           </div>
@@ -274,9 +291,11 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
           {waitingPatients
             .filter(p => !queueSearch || p.patientName?.toLowerCase().includes(queueSearch.toLowerCase()) || p.tokenNumber?.toLowerCase().includes(queueSearch.toLowerCase()))
             .length === 0 ? (
-            <div className="text-center py-8 sm:py-10 opacity-50">
-              <span className="text-3xl sm:text-4xl block mb-2">☕</span>
-              <p className="text-xs sm:text-sm font-medium">No patients waiting.</p>
+            <div className="text-center py-8 sm:py-10 opacity-50 flex flex-col items-center">
+              <div className="w-12 h-12 rounded-2xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center mb-2 text-slate-400">
+                <ClipboardList className="w-6 h-6" />
+              </div>
+              <p className="text-xs sm:text-sm font-medium text-slate-400">No patients waiting in queue.</p>
             </div>
           ) : (
             waitingPatients
@@ -301,8 +320,9 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
                     <span className="text-[10px] font-mono font-bold text-blue-400 bg-blue-500/10 px-1.5 py-0.2 rounded border border-blue-500/20">{patient.tokenNumber}</span>
                     <span className="text-[10px] text-slate-500">{patient.patientAge}y</span>
                     {getPatientOcrText(patient) && (
-                      <span className="text-[9px] font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/30 px-1.5 py-0.2 rounded">
-                        📷 OCR Rx
+                      <span className="text-[9px] font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/30 px-1.5 py-0.2 rounded font-mono inline-flex items-center gap-1">
+                        <Scan className="w-2.5 h-2.5 text-indigo-400" />
+                        <span>OCR Rx</span>
                       </span>
                     )}
                   </div>
@@ -332,8 +352,9 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
         }`}
       >
         <h2 className="text-xl sm:text-2xl font-black text-white mb-4 sm:mb-6 border-b border-slate-800 pb-3 sm:pb-4 flex items-center justify-between">
-          <span className="flex items-center">
-            <span className="text-blue-500 mr-2 sm:mr-3">🩺</span> Active Consultation Workspace
+          <span className="flex items-center gap-2.5">
+            <Stethoscope className="w-5 h-5 text-blue-400" />
+            <span>Active Consultation Workspace</span>
           </span>
           {currentPatient && (
             <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full flex items-center gap-1.5">
@@ -353,8 +374,9 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
                     ● Active Patient
                   </span>
                   {currentPatient.isEmergency && (
-                    <span className="text-[10px] text-red-400 font-black uppercase px-2 py-0.5 rounded-full bg-red-500/20 border border-red-500/30 animate-pulse">
-                      🚨 Priority Emergency
+                    <span className="text-[10px] text-rose-400 font-black uppercase px-2 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/30 animate-pulse inline-flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3 text-rose-400" />
+                      <span>Priority Emergency</span>
                     </span>
                   )}
                 </div>
@@ -367,13 +389,15 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
                     {currentPatient.symptoms || "General OPD Consultation"}
                   </span>
                   {currentPatient.appointmentDate && (
-                    <span className="text-[11px] text-slate-400 bg-slate-900 px-2 py-0.5 rounded-md border border-slate-800">
-                      📅 {currentPatient.appointmentDate}
+                    <span className="text-[11px] text-slate-400 bg-slate-900 px-2 py-0.5 rounded-md border border-slate-800 inline-flex items-center gap-1">
+                      <Calendar className="w-3 h-3 text-slate-500" />
+                      <span>{currentPatient.appointmentDate}</span>
                     </span>
                   )}
                   {currentPatient.timeSlot && (
-                    <span className="text-[11px] text-slate-400 bg-slate-900 px-2 py-0.5 rounded-md border border-slate-800">
-                      ⏱️ {currentPatient.timeSlot}
+                    <span className="text-[11px] text-slate-400 bg-slate-900 px-2 py-0.5 rounded-md border border-slate-800 inline-flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-slate-500" />
+                      <span>{currentPatient.timeSlot}</span>
                     </span>
                   )}
                 </div>
@@ -400,12 +424,13 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
               <div className="mb-4 sm:mb-5 p-3.5 sm:p-4 rounded-xl bg-indigo-950/40 border-2 border-indigo-500/40 relative shadow-lg shadow-indigo-500/10">
                 <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
                   <span className="text-xs font-bold uppercase tracking-widest text-indigo-300 flex items-center gap-1.5">
-                    <span>📷</span> Patient Scanned Paper Rx (ML Kit OCR)
+                    <Scan className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Patient Scanned Paper Rx (ML Kit OCR)</span>
                   </span>
                   <button 
                     type="button" 
                     onClick={handleAppendScannedNotes}
-                    className="text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 px-3 py-1.5 rounded-lg transition-all shadow-md active:scale-95 flex items-center gap-1"
+                    className="text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 px-3 py-1.5 rounded-lg transition-all shadow-md active:scale-95 flex items-center gap-1 cursor-pointer"
                   >
                     <span>+</span> Insert into Prescription
                   </button>
@@ -416,8 +441,9 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
               </div>
             ) : (
               <div className="mb-4 p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
-                <span className="flex items-center gap-1.5">
-                  <span>📄</span> No paper prescription scanned for this checkup
+                <span className="flex items-center gap-1.5 text-xs text-slate-400">
+                  <FileText className="w-3.5 h-3.5 text-slate-500" />
+                  <span>No paper prescription scanned for this checkup</span>
                 </span>
                 <span className="text-[10px] font-mono text-slate-500 uppercase">ML Kit OCR Ready</span>
               </div>
@@ -456,8 +482,9 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
             {/* E-Prescription Input */}
             <div className="flex-1 flex flex-col mb-4 sm:mb-6">
               <div className="flex justify-between items-center mb-1.5">
-                <label className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-widest flex items-center">
-                  <span className="mr-1.5">💊</span> Digital E-Prescription & Advice
+                <label className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-widest flex items-center gap-1.5">
+                  <Pill className="w-3.5 h-3.5 text-teal-400" />
+                  <span>Digital E-Prescription & Advice</span>
                 </label>
                 {prescriptionText && (
                   <button onClick={() => setPrescriptionText("")} className="text-[11px] text-slate-500 hover:text-red-400 transition-colors">Clear</button>
@@ -466,7 +493,7 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
               <textarea 
                 value={prescriptionText}
                 onChange={(e) => setPrescriptionText(e.target.value)}
-                placeholder="Type medicines or click 1-tap chips above..."
+                placeholder="Type medicines or click quick prescribing chips above..."
                 rows={4}
                 className="w-full min-h-[110px] bg-slate-950 text-white p-3.5 sm:p-4 rounded-xl border border-slate-700 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none resize-y font-mono text-xs sm:text-sm leading-relaxed transition-colors shadow-inner"
               ></textarea>
@@ -478,18 +505,18 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
 
             <button 
               onClick={handleComplete}
-              className="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black py-3.5 sm:py-4 rounded-xl text-base shadow-[0_0_20px_rgba(16,185,129,0.25)] transition-all active:scale-98 flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black py-3.5 sm:py-4 rounded-xl text-base shadow-[0_0_20px_rgba(16,185,129,0.25)] transition-all active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>✅</span>
+              <CheckCircle2 className="w-5 h-5" />
               <span>Finish Consultation & Sync to Pharmacy</span>
             </button>
           </div>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-center py-12 sm:py-16 opacity-40">
-            <div className="w-24 h-24 sm:w-32 sm:h-32 bg-slate-800 rounded-full flex items-center justify-center mb-4 sm:mb-6">
-              <span className="text-4xl sm:text-6xl">📋</span>
+            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-slate-800/80 border border-slate-700/60 rounded-3xl flex items-center justify-center mb-4 sm:mb-6 text-slate-400 shadow-inner">
+              <Stethoscope className="w-10 h-10 text-slate-400" />
             </div>
-            <h3 className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">Workspace is Clear</h3>
+            <h3 className="text-xl sm:text-2xl font-black text-white mb-1 sm:mb-2 tracking-tight">Cabin is Ready</h3>
             <p className="text-slate-400 text-xs sm:text-sm max-w-sm px-4">Call the next patient from the waiting queue on the left to begin consultation.</p>
           </div>
         )}
