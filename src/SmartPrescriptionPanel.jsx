@@ -21,6 +21,21 @@ export default function SmartPrescriptionPanel({ hospitalId, doctorName }) {
   const signCanvasRef = useRef(null);
   const signContextRef = useRef(null);
 
+  const normalizeDoc = (name) => (name || "").toLowerCase().replace(/^dr\.?\s*/i, "").trim();
+
+  // Helper to extract OCR text from any possible field key
+  const getPatientOcrText = (patient) => {
+    if (!patient) return "";
+    return patient.scannedPrescriptionText 
+      || patient.ocrText 
+      || patient.scannedText 
+      || patient.extractedOcr 
+      || patient.prescriptionOcr 
+      || patient.extractedText 
+      || patient.paperPrescriptionOcr
+      || "";
+  };
+
   // --- 0. LOAD SAVED LETTERHEAD ON BOOT ---
   useEffect(() => {
     const savedLetterhead = localStorage.getItem(`arogya_letterhead_${hospitalId}_${doctorName}`);
@@ -29,19 +44,44 @@ export default function SmartPrescriptionPanel({ hospitalId, doctorName }) {
     }
   }, [hospitalId, doctorName]);
 
-  // --- 1. THE MULTI-TENANT & DOCTOR-SPECIFIC LOCK ---
+  // --- 1. PERSISTENT DOCTOR QUEUE & ACTIVE CONSULTATION LISTENER ---
   useEffect(() => {
     if (!hospitalId || !doctorName) return;
 
     const q = query(
       collection(db, 'appointments'), 
       where("hospitalId", "==", hospitalId), 
-      where("status", "==", "Waiting"),
-      where("doctorName", "==", doctorName)
+      where("status", "in", ["Waiting", "In Consultation"])
     );
 
     const unsub = onSnapshot(q, (snapshot) => {
-      setWaitingPatients(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const all = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const myDoctorNorm = normalizeDoc(doctorName);
+
+      const doctorPatients = all.filter(p => {
+        if (!p.doctorName) return true;
+        return normalizeDoc(p.doctorName) === myDoctorNorm || p.doctorName.toLowerCase() === doctorName.toLowerCase();
+      });
+
+      const waiting = doctorPatients
+        .filter(p => p.status === "Waiting")
+        .sort((a, b) => {
+          if (a.isEmergency && !b.isEmergency) return -1;
+          if (!a.isEmergency && b.isEmergency) return 1;
+          return (a.tokenInt || 0) - (b.tokenInt || 0);
+        });
+
+      const active = doctorPatients.find(p => p.status === "In Consultation");
+
+      setWaitingPatients(waiting);
+
+      if (active) {
+        setCurrentPatient(active);
+      } else {
+        setCurrentPatient(null);
+      }
+    }, (err) => {
+      console.error("SmartPad queue error:", err);
     });
     return () => unsub();
   }, [hospitalId, doctorName]); 
@@ -73,7 +113,13 @@ export default function SmartPrescriptionPanel({ hospitalId, doctorName }) {
   // --- 2. CALL NEXT PATIENT LOGIC ---
   const handleCallNext = async (patient) => {
     try {
-      await updateDoc(doc(db, 'appointments', patient.id), { status: 'In Consultation' });
+      setCurrentPatient(patient);
+      setPrescriptionText("");
+
+      await updateDoc(doc(db, 'appointments', patient.id), { 
+        status: 'In Consultation',
+        consultationStartedAt: new Date().toISOString()
+      });
       
       await setDoc(doc(db, 'queue', hospitalId), {
         activeDoctor: doctorName,
@@ -82,10 +128,32 @@ export default function SmartPrescriptionPanel({ hospitalId, doctorName }) {
         lastUpdated: new Date()
       }, { merge: true });
 
-      setCurrentPatient(patient);
+      await setDoc(doc(db, 'doctor_status', doctorName), {
+        status: 'In Consultation',
+        currentToken: patient.tokenNumber,
+        currentPatientName: patient.patientName,
+        currentPatientId: patient.id,
+        lastUpdated: new Date().toISOString()
+      }, { merge: true });
+    } catch (err) {
+      console.error("Error calling patient:", err);
+    }
+  };
+
+  // --- CANCEL / RETURN PATIENT TO QUEUE ---
+  const handleCancelConsultation = async () => {
+    if (!currentPatient) return;
+    try {
+      await updateDoc(doc(db, 'appointments', currentPatient.id), { status: 'Waiting' });
+      await setDoc(doc(db, 'doctor_status', doctorName), {
+        status: 'Active',
+        currentToken: null,
+        lastUpdated: new Date().toISOString()
+      }, { merge: true });
+      setCurrentPatient(null);
       setPrescriptionText("");
     } catch (err) {
-      console.error(err);
+      console.error("Error cancelling consultation:", err);
     }
   };
 
@@ -97,13 +165,20 @@ export default function SmartPrescriptionPanel({ hospitalId, doctorName }) {
       await updateDoc(doc(db, 'appointments', currentPatient.id), {
         status: 'Completed',
         prescription: prescriptionText,
-        pharmacyStatus: prescriptionText.trim() !== "" ? 'Pending' : 'Skipped' 
+        pharmacyStatus: prescriptionText.trim() !== "" ? 'Pending' : 'Skipped',
+        completedAt: new Date().toISOString()
       });
 
       await setDoc(doc(db, 'queue', hospitalId), {
         activeDoctor: doctorName,
         status: 'Available',
         lastUpdated: new Date()
+      }, { merge: true });
+
+      await setDoc(doc(db, 'doctor_status', doctorName), {
+        status: 'Active',
+        currentToken: null,
+        lastUpdated: new Date().toISOString()
       }, { merge: true });
 
       window.print();
@@ -217,7 +292,7 @@ export default function SmartPrescriptionPanel({ hospitalId, doctorName }) {
                       <p className="font-bold text-white text-sm sm:text-md">{patient.patientName}</p>
                       <div className="flex items-center gap-2">
                         <p className="text-xs text-slate-500">Token: <span className="font-bold text-slate-300">{patient.tokenNumber}</span></p>
-                        {patient.scannedPrescriptionText && (
+                        {getPatientOcrText(patient) && (
                           <span className="text-[9px] font-bold text-indigo-400 bg-indigo-500/10 border border-indigo-500/30 px-1.5 py-0.5 rounded">
                             📷 OCR Rx
                           </span>
@@ -255,38 +330,63 @@ export default function SmartPrescriptionPanel({ hospitalId, doctorName }) {
           <>
             <div className="bg-slate-950 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
               <div className="flex justify-between items-start mb-3">
-                <div>
-                  <p className="text-[9px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-0.5">Active Patient</p>
-                  <h3 className="text-xl sm:text-2xl font-black text-white">{currentPatient.patientName}</h3>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                      ● Active Consultation
+                    </span>
+                    {currentPatient.isEmergency && (
+                      <span className="text-[10px] text-red-400 font-black uppercase px-2 py-0.5 rounded-full bg-red-500/20 border border-red-500/30 animate-pulse">
+                        🚨 Emergency
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-black text-white">
+                    {currentPatient.patientName} <span className="text-xs font-medium text-slate-400">({currentPatient.patientAge || 'Age N/A'} yrs)</span>
+                  </h3>
+                  {currentPatient.symptoms && (
+                    <p className="text-xs text-slate-300">
+                      <span className="text-slate-500 font-bold uppercase text-[10px] mr-1">Symptoms:</span>
+                      {currentPatient.symptoms}
+                    </p>
+                  )}
                 </div>
                 <div className="text-right">
                   <p className="text-[9px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-0.5">Token</p>
-                  <p className="text-lg sm:text-xl font-black text-blue-500">{currentPatient.tokenNumber}</p>
+                  <p className="text-lg sm:text-2xl font-black text-blue-400 font-mono bg-blue-500/10 px-2.5 py-0.5 rounded-xl border border-blue-500/20">{currentPatient.tokenNumber}</p>
+                  <button onClick={handleCancelConsultation} className="text-[11px] text-red-400 hover:text-red-300 font-bold underline mt-1 block">
+                    Cancel / Return
+                  </button>
                 </div>
               </div>
-              <button onClick={() => setCurrentPatient(null)} className="text-xs text-red-400 hover:text-red-300 underline">
-                Cancel Consultation
-              </button>
             </div>
 
             {/* 📷 SCANNED PAPER PRESCRIPTION (ML Kit OCR) */}
-            {currentPatient.scannedPrescriptionText && (
-              <div className="bg-slate-950 p-3 sm:p-4 rounded-2xl border border-indigo-500/40">
+            {getPatientOcrText(currentPatient) ? (
+              <div className="bg-slate-950 p-3 sm:p-4 rounded-2xl border-2 border-indigo-500/40 shadow-lg shadow-indigo-500/10">
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-indigo-400 flex items-center gap-1">
-                    <span>📷</span> Scanned Paper Rx (OCR)
+                    <span>📷</span> Scanned Paper Rx (ML Kit OCR)
                   </span>
                   <button 
                     type="button" 
-                    onClick={() => setPrescriptionText(prev => prev.trim() ? `${prev}\n\n[Previous Rx]: ${currentPatient.scannedPrescriptionText}` : currentPatient.scannedPrescriptionText)}
-                    className="text-[10px] font-bold text-indigo-300 hover:text-white bg-indigo-600/30 hover:bg-indigo-600 px-2 py-0.5 rounded transition-colors"
+                    onClick={() => {
+                      const ocr = getPatientOcrText(currentPatient);
+                      setPrescriptionText(prev => prev.trim() ? `${prev}\n\n[Previous Rx (OCR)]: ${ocr}` : ocr);
+                    }}
+                    className="text-[10px] font-bold text-white bg-indigo-600 hover:bg-indigo-500 px-2.5 py-1 rounded-lg transition-colors shadow-sm"
                   >
-                    + Insert
+                    + Insert into Pad
                   </button>
                 </div>
-                <p className="text-xs text-slate-300 font-mono bg-slate-900 p-2.5 rounded-lg border border-slate-800 max-h-24 overflow-y-auto whitespace-pre-wrap leading-relaxed">
-                  {currentPatient.scannedPrescriptionText}
+                <p className="text-xs text-slate-200 font-mono bg-slate-900 p-2.5 rounded-lg border border-slate-800 max-h-28 overflow-y-auto whitespace-pre-wrap leading-relaxed shadow-inner">
+                  {getPatientOcrText(currentPatient)}
                 </p>
+              </div>
+            ) : (
+              <div className="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+                <span>📄 No previous paper Rx scanned</span>
+                <span className="text-[10px] font-mono text-slate-500 uppercase">ML Kit Ready</span>
               </div>
             )}
 
