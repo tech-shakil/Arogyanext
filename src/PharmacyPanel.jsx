@@ -21,36 +21,53 @@ export default function PharmacyPanel({ hospitalId }) {
   const [filterUrgentOnly, setFilterUrgentOnly] = useState(false);
   const [lastDispensedPatient, setLastDispensedPatient] = useState(null);
 
-  // Listen for pending pharmacy orders
+  // Resilient real-time listener for pharmacy orders
   useEffect(() => {
-    if (!hospitalId) return;
+    const appointmentsRef = collection(db, 'appointments');
+    const isMaster = !hospitalId || hospitalId === 'SYSTEM_MASTER';
 
-    const q = query(
-      collection(db, 'appointments'),
-      where('hospitalId', '==', hospitalId),
-      where('pharmacyStatus', '==', 'Pending')
-    );
+    // If hospitalId is provided and specific, filter by hospitalId; otherwise listen across facilities
+    const q = isMaster
+      ? query(appointmentsRef)
+      : query(appointmentsRef, where('hospitalId', '==', hospitalId));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setPendingOrders(orders);
-    });
+      const allAppts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    return () => unsubscribe();
-  }, [hospitalId]);
+      // Filter pending orders (resilient to casing and completed consultation flow)
+      const pending = allAppts.filter(order => {
+        const pStatus = (order.pharmacyStatus || '').toLowerCase();
+        
+        // Explicitly marked as pending
+        if (pStatus === 'pending') return true;
+        
+        // Completed consultations with prescription that haven't been dispensed yet and were not skipped
+        if (order.status === 'Completed' && pStatus !== 'dispensed' && pStatus !== 'skipped') {
+          return Boolean(order.prescription || order.scannedPrescriptionText || order.ocrText);
+        }
+        
+        return false;
+      });
 
-  // Listen for dispensed orders count today
-  useEffect(() => {
-    if (!hospitalId) return;
+      // Sort pending orders: Emergencies first, then chronological
+      pending.sort((a, b) => {
+        if (a.isEmergency && !b.isEmergency) return -1;
+        if (!a.isEmergency && b.isEmergency) return 1;
+        const timeA = a.sentToPharmacyAt || a.completedAt || a.timestamp || 0;
+        const timeB = b.sentToPharmacyAt || b.completedAt || b.timestamp || 0;
+        return timeA < timeB ? -1 : 1;
+      });
 
-    const q = query(
-      collection(db, 'appointments'),
-      where('hospitalId', '==', hospitalId),
-      where('pharmacyStatus', '==', 'Dispensed')
-    );
+      // Count dispensed orders
+      const dispensed = allAppts.filter(order => {
+        const pStatus = (order.pharmacyStatus || '').toLowerCase();
+        return pStatus === 'dispensed';
+      });
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setDispensedCount(snapshot.docs.length);
+      setPendingOrders(pending);
+      setDispensedCount(dispensed.length);
+    }, (error) => {
+      console.error("Pharmacy orders listener error:", error);
     });
 
     return () => unsubscribe();

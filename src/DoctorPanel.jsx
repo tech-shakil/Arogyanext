@@ -66,11 +66,12 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
   useEffect(() => {
     if (!hospitalId || !doctorName) return;
 
-    const q = query(
-      collection(db, 'appointments'), 
-      where("hospitalId", "==", hospitalId),
-      where("status", "in", ["Waiting", "In Consultation"])
-    );
+    const appointmentsRef = collection(db, 'appointments');
+    const isMaster = hospitalId === 'SYSTEM_MASTER';
+
+    const q = isMaster
+      ? query(appointmentsRef, where("status", "in", ["Waiting", "In Consultation"]))
+      : query(appointmentsRef, where("hospitalId", "==", hospitalId), where("status", "in", ["Waiting", "In Consultation"]));
 
     const unsub = onSnapshot(q, (snapshot) => {
       const all = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -160,15 +161,22 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
     }
   };
 
-  // 4. Complete Consultation
-  const handleComplete = async () => {
+  // 4. Complete Consultation & Send to Pharmacy
+  const handleComplete = async (sendToPharmacy = true) => {
     if (!currentPatient) return;
     try {
+      const ocrPrescription = getPatientOcrText(currentPatient);
+      const finalPrescription = prescriptionText.trim() 
+        || ocrPrescription 
+        || (sendToPharmacy ? "Consultation Completed — Routine Dispensation / Advice" : "");
+
       await updateDoc(doc(db, 'appointments', currentPatient.id), { 
         status: 'Completed',
-        prescription: prescriptionText, 
-        pharmacyStatus: prescriptionText.trim() !== "" ? 'Pending' : 'Skipped',
-        completedAt: new Date().toISOString()
+        prescription: finalPrescription, 
+        pharmacyStatus: sendToPharmacy ? 'Pending' : 'Skipped',
+        completedAt: new Date().toISOString(),
+        sentToPharmacyAt: sendToPharmacy ? new Date().toISOString() : null,
+        hospitalId: currentPatient.hospitalId || hospitalId
       });
       
       // Reset doctor status
@@ -182,7 +190,8 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
       setCurrentPatient(null);
       setPrescriptionText("");
     } catch (err) {
-      console.error(err);
+      console.error("Error completing consultation:", err);
+      alert("Failed to send prescription to Pharmacy. Please check connection and try again.");
     }
   };
 
@@ -545,16 +554,28 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
               </p>
             </div>
 
-            <button 
-              onClick={handleComplete}
-              className="w-full py-3 rounded-md font-semibold text-sm text-white transition-colors cursor-pointer flex items-center justify-center gap-2"
-              style={{ background: 'var(--positive-500)' }}
-              onMouseEnter={e => e.currentTarget.style.background = 'var(--positive-600)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'var(--positive-500)'}
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Complete & Send to Pharmacy</span>
-            </button>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <button 
+                onClick={() => handleComplete(true)}
+                className="flex-1 py-3 rounded-md font-semibold text-sm text-white transition-colors cursor-pointer flex items-center justify-center gap-2"
+                style={{ background: 'var(--positive-500)' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--positive-600)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'var(--positive-500)'}
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Complete & Send to Pharmacy</span>
+              </button>
+              <button 
+                onClick={() => handleComplete(false)}
+                className="py-3 px-3 rounded-md font-medium text-xs border transition-colors cursor-pointer flex items-center justify-center gap-1"
+                style={{ borderColor: 'var(--border-default)', background: 'var(--surface-secondary)', color: 'var(--text-tertiary)' }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface-tertiary)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface-secondary)'; e.currentTarget.style.color = 'var(--text-tertiary)'; }}
+                title="Complete visit without sending prescription to pharmacy"
+              >
+                <span>Discharge Only</span>
+              </button>
+            </div>
           </div>
         ) : (
           /* Empty State */

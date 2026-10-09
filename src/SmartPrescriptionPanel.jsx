@@ -162,11 +162,15 @@ export default function SmartPrescriptionPanel({ hospitalId, doctorName }) {
     if (!currentPatient) return;
 
     try {
+      const finalPrescription = prescriptionText.trim() || "Consultation Completed — Routine Dispensation / Advice";
+
       await updateDoc(doc(db, 'appointments', currentPatient.id), {
         status: 'Completed',
-        prescription: prescriptionText,
-        pharmacyStatus: prescriptionText.trim() !== "" ? 'Pending' : 'Skipped',
-        completedAt: new Date().toISOString()
+        prescription: finalPrescription,
+        pharmacyStatus: 'Pending',
+        completedAt: new Date().toISOString(),
+        sentToPharmacyAt: new Date().toISOString(),
+        hospitalId: currentPatient.hospitalId || hospitalId
       });
 
       await setDoc(doc(db, 'queue', hospitalId), {
@@ -188,6 +192,7 @@ export default function SmartPrescriptionPanel({ hospitalId, doctorName }) {
       clearSignature();
     } catch (err) {
       console.error(err);
+      alert("Failed to submit prescription to Pharmacy. Please check connection.");
     }
   };
 
