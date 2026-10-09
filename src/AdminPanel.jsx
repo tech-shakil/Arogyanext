@@ -1,6 +1,19 @@
 import { useState, useEffect } from 'react';
 import { db } from './firebase';
 import { collection, query, onSnapshot, orderBy, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { 
+  Building2, 
+  Users, 
+  Stethoscope, 
+  Pill, 
+  ShieldCheck, 
+  ClipboardList, 
+  Plus, 
+  Trash2, 
+  Loader2, 
+  UserX,
+  AlertCircle
+} from 'lucide-react';
 
 export default function AdminPanel() {
   const [allUsers, setAllUsers] = useState([]);
@@ -20,167 +33,252 @@ export default function AdminPanel() {
 
   const handleCreateHospital = async (e) => {
     e.preventDefault();
-    if (!newHospitalName) return;
+    if (!newHospitalName.trim()) return;
     setIsCreating(true);
     const newId = `HOSP_${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
-    await setDoc(doc(db, 'hospitals', newId), { hospitalName: newHospitalName, hospitalId: newId });
+    await setDoc(doc(db, 'hospitals', newId), { 
+      hospitalName: newHospitalName.trim(), 
+      hospitalId: newId, 
+      createdAt: new Date().toISOString() 
+    });
     setNewHospitalName('');
     setIsCreating(false);
   };
 
-  const handleDeleteHospital = async (id, name) => {
-    if(confirm(`Are you sure you want to delete ${name}?`)) await deleteDoc(doc(db, 'hospitals', id));
+  const handleDeleteHospital = async (id, name, hospitalIdCode) => {
+    if(confirm(`Are you sure you want to delete ${name} (${hospitalIdCode})? All associated staff accounts will also be removed.`)) {
+      await deleteDoc(doc(db, 'hospitals', id));
+      // Cascade delete staff belonging to this hospital to avoid orphaned records
+      const staffToDelete = allUsers.filter(u => u.hospitalId === hospitalIdCode);
+      for (const staff of staffToDelete) {
+        await deleteDoc(doc(db, 'users', staff.id));
+        if (staff.role === 'Doctor') {
+          await deleteDoc(doc(db, 'doctors', staff.id));
+        }
+      }
+    }
   };
 
   const handleDeleteUser = async (uid, name, role) => {
     if(confirm(`Remove ${name} (${role})?`)) {
-        await deleteDoc(doc(db, 'users', uid));
-        if(role === 'Doctor') await deleteDoc(doc(db, 'doctors', uid));
+      await deleteDoc(doc(db, 'users', uid));
+      if(role === 'Doctor') await deleteDoc(doc(db, 'doctors', uid));
     }
   };
 
+  const getRoleIcon = (role) => {
+    switch(role) {
+      case 'Doctor': return Stethoscope;
+      case 'Pharmacist': return Pill;
+      case 'Hospital Admin': return ShieldCheck;
+      default: return ClipboardList;
+    }
+  };
+
+  const getRoleBadgeStyle = (role) => {
+    switch(role) {
+      case 'Doctor': return 'badge--blue';
+      case 'Pharmacist': return 'badge--positive';
+      case 'Hospital Admin': return 'badge--warning';
+      default: return 'badge--neutral';
+    }
+  };
+
+  // Staff and personnel calculations tied to active hospitals
+  const activeHospitalIds = new Set(hospitalsList.map(h => h.hospitalId));
+  
+  // Users belonging to registered, active hospitals (excluding super admin)
+  const activeHospitalUsers = allUsers.filter(u => activeHospitalIds.has(u.hospitalId) && u.role !== 'Super Admin');
+  
+  // Clinical Doctors in active facilities
+  const activeDoctors = activeHospitalUsers.filter(u => u.role === 'Doctor');
+  
+  // Hospital Staff (Receptionists, Pharmacists, Local Admins) excluding Doctors
+  const activeSupportStaff = activeHospitalUsers.filter(u => u.role !== 'Doctor');
+  
+  // Total active personnel across all facilities
+  const totalActivePersonnel = activeHospitalUsers.length;
+
+  // Orphaned or unassigned user records (e.g., from deleted test facilities)
+  const orphanedUsers = allUsers.filter(u => !activeHospitalIds.has(u.hospitalId) && u.role !== 'Super Admin');
+
   return (
-    <div className="min-h-screen bg-slate-900 p-3 sm:p-6 md:p-8 text-slate-300 font-sans">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 font-sans" style={{ background: 'var(--surface-app)' }}>
       <div className="max-w-7xl mx-auto">
         
-        {/* HEADER SECTION */}
-        <div className="mb-6 sm:mb-12 border-b border-slate-800 pb-4 sm:pb-8">
-          <p className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 font-bold uppercase tracking-[0.2em] text-[10px] sm:text-xs mb-1 sm:mb-2">
-            Founder's Control Center
+        {/* HEADER */}
+        <div className="mb-5 sm:mb-6 border-b pb-4" style={{ borderColor: 'var(--border-subtle)' }}>
+          <p className="text-xs font-semibold uppercase mb-0.5" style={{ color: 'var(--blue-600)', letterSpacing: '0.04em' }}>
+            Founder Console
           </p>
-          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">SaaS Platform Overview</h1>
+          <h1 className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Platform Management</h1>
         </div>
 
-        {/* METRIC MATRIX ARCHITECTURE */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-12">
-          <div className="relative group rounded-2xl sm:rounded-3xl p-[1px] bg-gradient-to-b from-blue-500/30 to-transparent">
-            <div className="bg-slate-950 h-full w-full rounded-[15px] sm:rounded-[23px] p-4 sm:p-6 relative overflow-hidden">
-              <h3 className="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 sm:mb-2">Active Hospitals</h3>
-              <p className="text-3xl sm:text-5xl font-black text-white">{hospitalsList.length}</p>
+        {/* METRICS */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5 sm:mb-6">
+          <div className="p-4 rounded-lg border flex items-center justify-between" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+            <div>
+              <p className="text-[11px] font-semibold uppercase" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.04em' }}>Active Hospitals</p>
+              <p className="text-2xl sm:text-3xl font-bold mt-0.5" style={{ color: 'var(--text-primary)' }}>{hospitalsList.length}</p>
+            </div>
+            <div className="w-10 h-10 rounded-md flex items-center justify-center" style={{ background: 'var(--blue-50)' }}>
+              <Building2 className="w-5 h-5" style={{ color: 'var(--blue-600)' }} />
             </div>
           </div>
 
-          <div className="relative group rounded-2xl sm:rounded-3xl p-[1px] bg-gradient-to-b from-purple-500/30 to-transparent">
-            <div className="bg-slate-950 h-full w-full rounded-[15px] sm:rounded-[23px] p-4 sm:p-6 relative overflow-hidden">
-              <h3 className="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 sm:mb-2">Total Doctors</h3>
-              <p className="text-3xl sm:text-5xl font-black text-white">{allUsers.filter(u => u.role === 'Doctor').length}</p>
+          <div className="p-4 rounded-lg border flex items-center justify-between" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+            <div>
+              <p className="text-[11px] font-semibold uppercase" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.04em' }}>Clinical Doctors</p>
+              <p className="text-2xl sm:text-3xl font-bold mt-0.5" style={{ color: 'var(--text-primary)' }}>{activeDoctors.length}</p>
+            </div>
+            <div className="w-10 h-10 rounded-md flex items-center justify-center" style={{ background: 'var(--blue-50)' }}>
+              <Stethoscope className="w-5 h-5" style={{ color: 'var(--blue-600)' }} />
             </div>
           </div>
 
-          <div className="relative group rounded-2xl sm:rounded-3xl p-[1px] bg-gradient-to-b from-emerald-500/30 to-transparent">
-            <div className="bg-slate-950 h-full w-full rounded-[15px] sm:rounded-[23px] p-4 sm:p-6 relative overflow-hidden">
-              <h3 className="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 sm:mb-2">Total Staff Users</h3>
-              <p className="text-3xl sm:text-5xl font-black text-white">{allUsers.length}</p>
+          <div className="p-4 rounded-lg border flex items-center justify-between" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+            <div>
+              <p className="text-[11px] font-semibold uppercase" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.04em' }}>Hospital Staff</p>
+              <p className="text-2xl sm:text-3xl font-bold mt-0.5" style={{ color: 'var(--text-primary)' }}>{activeSupportStaff.length}</p>
+              <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>Reception, Pharmacy & Admin</p>
+            </div>
+            <div className="w-10 h-10 rounded-md flex items-center justify-center" style={{ background: 'var(--positive-50)' }}>
+              <Users className="w-5 h-5" style={{ color: 'var(--positive-500)' }} />
+            </div>
+          </div>
+
+          <div className="p-4 rounded-lg border flex items-center justify-between" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+            <div>
+              <p className="text-[11px] font-semibold uppercase" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.04em' }}>Active Personnel</p>
+              <p className="text-2xl sm:text-3xl font-bold mt-0.5" style={{ color: 'var(--text-primary)' }}>{totalActivePersonnel}</p>
+              <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>Across active facilities</p>
+            </div>
+            <div className="w-10 h-10 rounded-md flex items-center justify-center" style={{ background: 'var(--surface-secondary)' }}>
+              <ShieldCheck className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
           
-          {/* REGISTER CLIENT */}
+          {/* REGISTER NEW CLIENT */}
           <div className="lg:col-span-1">
-            <div className="rounded-2xl sm:rounded-3xl p-[1px] bg-gradient-to-br from-blue-500/40 via-transparent to-transparent">
-              <div className="bg-slate-950 rounded-[15px] sm:rounded-[23px] p-5 sm:p-8 relative overflow-hidden">
-                <h2 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6 flex items-center">
-                  <span className="w-2 h-2 rounded-full bg-blue-500 mr-2.5 sm:mr-3 shadow-[0_0_10px_rgba(59,130,246,0.8)]"></span>
-                  Register New Client
-                </h2>
+            <div className="p-4 sm:p-5 rounded-lg border" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+              <h2 className="text-sm font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                <Plus className="w-4 h-4" style={{ color: 'var(--blue-600)' }} />
+                Register New Client
+              </h2>
+              
+              <form onSubmit={handleCreateHospital} className="space-y-3">
+                <div>
+                  <label className="block text-[11px] font-semibold uppercase mb-1" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.03em' }}>Hospital Name</label>
+                  <input 
+                    type="text" required value={newHospitalName} onChange={(e) => setNewHospitalName(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-md border outline-none text-sm transition-colors font-medium"
+                    style={{ borderColor: 'var(--border-default)', background: 'var(--surface-secondary)', color: 'var(--text-primary)' }}
+                    onFocus={e => e.target.style.borderColor = 'var(--border-focus)'}
+                    onBlur={e => e.target.style.borderColor = 'var(--border-default)'}
+                    placeholder="e.g. Apollo Hospital"
+                  />
+                </div>
                 
-                <form onSubmit={handleCreateHospital} className="space-y-4 sm:space-y-5">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 sm:mb-2">Hospital Name</label>
-                    <input 
-                      type="text" required value={newHospitalName} onChange={(e) => setNewHospitalName(e.target.value)}
-                      className="w-full px-4 py-3 sm:px-5 sm:py-4 rounded-xl border border-slate-800 bg-slate-900 focus:border-blue-500 outline-none text-white text-sm transition-all" 
-                      placeholder="e.g. Apollo Hospital"
-                    />
-                  </div>
-                  
-                  <button 
-                    type="submit" disabled={isCreating}
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-black py-3.5 sm:py-4 rounded-xl text-sm sm:text-base transition-all shadow-md disabled:opacity-50 mt-2 active:scale-98"
-                  >
-                    {isCreating ? 'Generating Workspace...' : 'Generate Access Code'}
-                  </button>
-                </form>
-              </div>
+                <button 
+                  type="submit" disabled={isCreating}
+                  className="w-full py-2.5 rounded-md font-semibold text-sm text-white transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                  style={{ background: 'var(--blue-600)' }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'var(--blue-700)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'var(--blue-600)'}
+                >
+                  {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                  {isCreating ? 'Provisioning...' : 'Deploy Hospital Tenant'}
+                </button>
+              </form>
             </div>
           </div>
 
-          {/* REGISTERED WORKSPACES */}
-          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 tracking-tight">Registered Workspaces</h2>
-            
+          {/* REGISTERED HOSPITALS & STAFF */}
+          <div className="lg:col-span-2 space-y-4">
+            <h2 className="text-sm font-semibold flex items-center justify-between" style={{ color: 'var(--text-primary)' }}>
+              <span>Registered Hospitals ({hospitalsList.length})</span>
+            </h2>
+
             {hospitalsList.length === 0 ? (
-              <div className="bg-slate-950 border border-slate-800 rounded-2xl p-8 sm:p-12 text-center">
-                <span className="text-4xl sm:text-5xl block mb-3 sm:mb-4 opacity-30">🏥</span>
-                <p className="text-slate-400 text-xs sm:text-sm font-medium">No hospitals registered yet. Create one on the left.</p>
+              <div className="p-8 rounded-lg border text-center" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+                <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>No hospital tenants deployed yet.</p>
               </div>
             ) : (
               hospitalsList.map(hospital => {
                 const hospitalStaff = allUsers.filter(u => u.hospitalId === hospital.hospitalId);
 
                 return (
-                  <div key={hospital.id} className="bg-slate-950 border border-slate-800 rounded-xl sm:rounded-2xl overflow-hidden shadow-xl transition-all">
-                    <div className="bg-slate-900 border-b border-slate-800 p-4 sm:px-6 sm:py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                  <div key={hospital.id} className="rounded-lg border overflow-hidden" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+                    {/* Hospital Header */}
+                    <div className="p-3 sm:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b" style={{ borderColor: 'var(--border-subtle)', background: 'var(--surface-secondary)' }}>
                       <div>
-                        <h3 className="font-black text-lg sm:text-xl text-white tracking-wide">{hospital.hospitalName}</h3>
-                        <div className="flex items-center gap-2 mt-1 sm:mt-2">
-                          <span className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-widest font-bold">Code:</span>
-                          <span className="text-emerald-400 bg-emerald-400/10 border border-emerald-500/20 px-2 py-0.5 rounded font-mono text-xs sm:text-sm">
+                        <h3 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{hospital.hospitalName}</h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[10px] uppercase font-semibold" style={{ color: 'var(--text-muted)', letterSpacing: '0.04em' }}>Code:</span>
+                          <span className="text-xs font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: 'var(--positive-50)', color: 'var(--positive-600)', border: '1px solid var(--positive-100)' }}>
                             {hospital.hospitalId}
                           </span>
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                        <span className="bg-blue-500/10 border border-blue-500/20 text-blue-400 px-3 py-1 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider">
-                          {hospitalStaff.length} Active Staff
+                      <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                        <span className="badge badge--blue text-[10px]">
+                          <Users className="w-3 h-3" />
+                          {hospitalStaff.length} Staff Members
                         </span>
                         
                         <button 
-                          onClick={() => handleDeleteHospital(hospital.id, hospital.hospitalName)}
-                          className="bg-red-500/10 hover:bg-red-600 border border-red-500/20 text-red-400 hover:text-white px-2.5 py-1 rounded-lg text-xs font-bold transition-all active:scale-95"
+                          onClick={() => handleDeleteHospital(hospital.id, hospital.hospitalName, hospital.hospitalId)}
+                          className="px-2 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer flex items-center gap-1 border"
+                          style={{ borderColor: 'var(--danger-100)', color: 'var(--danger-500)', background: 'var(--danger-50)' }}
+                          onMouseEnter={e => { e.currentTarget.style.background = 'var(--danger-500)'; e.currentTarget.style.color = 'white'; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = 'var(--danger-50)'; e.currentTarget.style.color = 'var(--danger-500)' }}
                         >
+                          <Trash2 className="w-3 h-3" />
                           Delete
                         </button>
                       </div>
                     </div>
                     
-                    <div className="p-4 sm:p-6">
+                    {/* Staff List */}
+                    <div className="p-3 sm:p-4">
                       {hospitalStaff.length === 0 ? (
-                        <p className="text-xs sm:text-sm text-slate-500 italic flex items-center">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-600 mr-2 animate-pulse"></span>
-                          Waiting for staff to register using this code...
+                        <p className="text-xs font-medium flex items-center gap-1.5" style={{ color: 'var(--text-tertiary)' }}>
+                          <span className="status-dot status-dot--neutral animate-pulse-dot"></span>
+                          Waiting for staff registrations using code <span className="font-mono font-bold text-xs">{hospital.hospitalId}</span>
                         </p>
                       ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                          {hospitalStaff.map(staff => (
-                            <div key={staff.id} className="bg-slate-900 border border-slate-800 p-3 sm:p-4 rounded-xl flex flex-col justify-between relative group">
-                              <div>
-                                <p className="font-bold text-slate-200 text-sm truncate">{staff.fullName}</p>
-                                <p className="text-xs text-slate-500 mb-2 truncate">{staff.email}</p>
-                              </div>
-                              
-                              <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-800">
-                                <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded inline-block ${
-                                  staff.role === 'Doctor' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
-                                  staff.role === 'Pharmacist' ? 'bg-teal-500/10 text-teal-400 border border-teal-500/20' :
-                                  staff.role === 'Hospital Admin' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' :
-                                  'bg-slate-800 text-slate-300 border border-slate-700'
-                                }`}>
-                                  {staff.role}
-                                </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                          {hospitalStaff.map(staff => {
+                            const RoleIcon = getRoleIcon(staff.role);
+                            return (
+                              <div key={staff.id} className="p-2.5 rounded-md border group flex flex-col justify-between" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-subtle)' }}>
+                                <div>
+                                  <p className="font-medium text-xs truncate" style={{ color: 'var(--text-primary)' }}>{staff.fullName || 'Unnamed'}</p>
+                                  <p className="text-[10px] truncate" style={{ color: 'var(--text-muted)' }}>{staff.email}</p>
+                                </div>
                                 
-                                <button
-                                  onClick={() => handleDeleteUser(staff.id, staff.fullName, staff.role)}
-                                  className="text-red-400 hover:text-red-500 text-xs font-bold transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 p-1"
-                                >
-                                  Remove
-                                </button>
+                                <div className="flex items-center justify-between mt-2 pt-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+                                  <span className={`badge ${getRoleBadgeStyle(staff.role)} text-[9px]`}>
+                                    <RoleIcon className="w-3 h-3" />
+                                    {staff.role}
+                                  </span>
+                                  
+                                  <button
+                                    onClick={() => handleDeleteUser(staff.id, staff.fullName, staff.role)}
+                                    className="text-[10px] font-medium transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer flex items-center gap-0.5"
+                                    style={{ color: 'var(--danger-500)' }}
+                                  >
+                                    <UserX className="w-3 h-3" />
+                                    Remove
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -188,6 +286,48 @@ export default function AdminPanel() {
                 );
               })
             )}
+
+            {/* UNASSIGNED / LEGACY STAFF (if any from previous test deletions) */}
+            {orphanedUsers.length > 0 && (
+              <div className="rounded-lg border p-4 mt-6" style={{ background: 'var(--surface-primary)', borderColor: 'var(--warning-100)' }}>
+                <div className="flex items-center justify-between mb-3 pb-2 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4" style={{ color: 'var(--warning-500)' }} />
+                    <h3 className="text-xs font-semibold uppercase" style={{ color: 'var(--text-primary)', letterSpacing: '0.03em' }}>
+                      Unassigned Accounts ({orphanedUsers.length})
+                    </h3>
+                  </div>
+                  <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
+                    Accounts tied to deleted or invalid hospital IDs
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {orphanedUsers.map(staff => (
+                    <div key={staff.id} className="p-2.5 rounded-md border flex flex-col justify-between" style={{ background: 'var(--surface-secondary)', borderColor: 'var(--border-subtle)' }}>
+                      <div>
+                        <p className="font-medium text-xs truncate" style={{ color: 'var(--text-primary)' }}>{staff.fullName || 'Unnamed'}</p>
+                        <p className="text-[10px] truncate" style={{ color: 'var(--text-muted)' }}>{staff.email}</p>
+                        <p className="text-[9px] font-mono mt-1" style={{ color: 'var(--text-tertiary)' }}>ID: {staff.hospitalId || 'None'}</p>
+                      </div>
+                      
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+                        <span className="badge badge--neutral text-[9px]">{staff.role}</span>
+                        <button
+                          onClick={() => handleDeleteUser(staff.id, staff.fullName, staff.role)}
+                          className="text-[10px] font-medium cursor-pointer flex items-center gap-0.5"
+                          style={{ color: 'var(--danger-500)' }}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
 

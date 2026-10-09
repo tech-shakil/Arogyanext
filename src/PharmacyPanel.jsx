@@ -1,6 +1,18 @@
 import { useState, useEffect } from 'react';
 import { db } from './firebase';
 import { collection, query, where, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { 
+  Pill, 
+  Search, 
+  AlertTriangle, 
+  CheckCircle2, 
+  Clock, 
+  Package, 
+  Printer,
+  X as XIcon,
+  Stethoscope,
+  User
+} from 'lucide-react';
 
 export default function PharmacyPanel({ hospitalId }) {
   const [pendingOrders, setPendingOrders] = useState([]);
@@ -70,156 +82,190 @@ export default function PharmacyPanel({ hospitalId }) {
   });
 
   return (
-    <div className="min-h-screen bg-slate-900 p-3 sm:p-6 md:p-8 font-sans text-slate-300">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 font-sans" style={{ background: 'var(--surface-app)' }}>
       <div className="max-w-7xl mx-auto">
         
         {/* --- HEADER --- */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 sm:mb-8 border-b border-slate-800 pb-4 sm:pb-6">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 mb-5 sm:mb-6 border-b pb-4" style={{ borderColor: 'var(--border-subtle)' }}>
           <div>
-            <div className="flex items-center gap-2.5">
-              <span className="text-teal-400 text-3xl sm:text-4xl">💊</span>
-              <div>
-                <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-                  E-Pharmacy Fulfillment Hub
-                </h1>
-                <p className="text-slate-400 text-xs sm:text-sm font-medium">Real-Time Prescription Stream & Medication Dispensing</p>
-              </div>
-            </div>
+            <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+              <Pill className="w-5 h-5" style={{ color: 'var(--positive-500)' }} />
+              Pharmacy
+            </h1>
+            <p className="text-sm mt-0.5" style={{ color: 'var(--text-tertiary)' }}>Prescription fulfillment & medication dispensing</p>
           </div>
           
-          <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
-            <span className="bg-slate-800 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider">
-              ID: {hospitalId}
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <span className="px-2.5 py-1 rounded-md text-xs font-mono font-semibold border" style={{ background: 'var(--surface-secondary)', borderColor: 'var(--border-default)', color: 'var(--text-secondary)' }}>
+              {hospitalId}
             </span>
-            <div className="bg-teal-500/10 border border-teal-500/30 px-4 py-2 rounded-xl text-center">
-              <span className="text-teal-400 font-black text-lg block leading-none">{pendingOrders.length}</span>
-              <span className="text-teal-500/80 text-[10px] font-black uppercase tracking-wider">Pending Orders</span>
+            <div className="px-3 py-1.5 rounded-md text-center border" style={{ background: 'var(--blue-50)', borderColor: 'var(--blue-100)' }}>
+              <span className="font-bold text-base block leading-none" style={{ color: 'var(--blue-600)' }}>{pendingOrders.length}</span>
+              <span className="text-[10px] font-semibold uppercase" style={{ color: 'var(--blue-500)', letterSpacing: '0.03em' }}>Pending</span>
             </div>
           </div>
         </div>
 
-        {/* --- PHARMACY METRICS ROW --- */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 shadow-lg">
-            <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Orders In Queue</p>
-            <p className="text-2xl font-black text-teal-400 mt-1">{pendingOrders.length}</p>
+        {/* --- METRICS --- */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5 sm:mb-6">
+          <div className="p-3 sm:p-4 rounded-lg border flex items-center justify-between" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+            <div>
+              <p className="text-[10px] sm:text-[11px] font-semibold uppercase" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.04em' }}>In Queue</p>
+              <p className="text-lg sm:text-xl font-bold mt-0.5" style={{ color: 'var(--text-primary)' }}>{pendingOrders.length}</p>
+            </div>
+            <div className="w-8 h-8 rounded-md flex items-center justify-center" style={{ background: 'var(--blue-50)' }}>
+              <Package className="w-4 h-4" style={{ color: 'var(--blue-600)' }} />
+            </div>
           </div>
 
-          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 shadow-lg">
-            <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Dispensed Today</p>
-            <p className="text-2xl font-black text-emerald-400 mt-1">{dispensedCount}</p>
+          <div className="p-3 sm:p-4 rounded-lg border flex items-center justify-between" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+            <div>
+              <p className="text-[10px] sm:text-[11px] font-semibold uppercase" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.04em' }}>Dispensed</p>
+              <p className="text-lg sm:text-xl font-bold mt-0.5" style={{ color: 'var(--positive-500)' }}>{dispensedCount}</p>
+            </div>
+            <div className="w-8 h-8 rounded-md flex items-center justify-center" style={{ background: 'var(--positive-50)' }}>
+              <CheckCircle2 className="w-4 h-4" style={{ color: 'var(--positive-500)' }} />
+            </div>
           </div>
 
-          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 shadow-lg">
-            <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Avg Packing Time</p>
-            <p className="text-2xl font-black text-blue-400 mt-1">~2.5m</p>
+          <div className="p-3 sm:p-4 rounded-lg border flex items-center justify-between" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+            <div>
+              <p className="text-[10px] sm:text-[11px] font-semibold uppercase" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.04em' }}>Avg Time</p>
+              <p className="text-lg sm:text-xl font-bold mt-0.5" style={{ color: 'var(--text-primary)' }}>~2.5m</p>
+            </div>
+            <div className="w-8 h-8 rounded-md flex items-center justify-center" style={{ background: 'var(--surface-tertiary)' }}>
+              <Clock className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
+            </div>
           </div>
 
-          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 shadow-lg">
-            <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Revenue Retention</p>
-            <p className="text-2xl font-black text-purple-400 mt-1">100%</p>
+          <div className="p-3 sm:p-4 rounded-lg border flex items-center justify-between" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+            <div>
+              <p className="text-[10px] sm:text-[11px] font-semibold uppercase" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.04em' }}>Fill Rate</p>
+              <p className="text-lg sm:text-xl font-bold mt-0.5" style={{ color: 'var(--positive-500)' }}>100%</p>
+            </div>
+            <div className="w-8 h-8 rounded-md flex items-center justify-center" style={{ background: 'var(--positive-50)' }}>
+              <Pill className="w-4 h-4" style={{ color: 'var(--positive-500)' }} />
+            </div>
           </div>
         </div>
 
-        {/* Dispensed Toast */}
+        {/* Success Toast */}
         {lastDispensedPatient && (
-          <div className="mb-6 p-3.5 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-emerald-300 text-xs sm:text-sm font-bold flex items-center justify-between animate-fadeIn">
-            <span>✅ Medicines for {lastDispensedPatient} marked as Dispensed!</span>
-            <span className="text-[11px] text-emerald-400 font-mono">Sync Complete</span>
+          <div className="mb-4 p-3 rounded-md border text-xs font-medium flex items-center justify-between animate-fadeIn" style={{ background: 'var(--positive-50)', borderColor: 'var(--positive-100)', color: 'var(--positive-600)' }}>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              Medicines for {lastDispensedPatient} marked as dispensed
+            </span>
+            <span className="text-[10px] font-mono" style={{ color: 'var(--positive-500)' }}>Synced</span>
           </div>
         )}
 
-        {/* --- SEARCH & FILTER TOOLBAR --- */}
-        <div className="bg-slate-950 p-3.5 sm:p-4 rounded-2xl border border-slate-800 shadow-lg mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        {/* --- SEARCH & FILTER --- */}
+        <div className="p-3 rounded-lg border mb-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
           <div className="relative flex-1">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
             <input 
               type="text"
-              placeholder="Search by patient name, doctor, or token..."
+              placeholder="Search by patient, doctor, or token..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm rounded-xl border border-slate-800 bg-slate-900 focus:border-teal-500 outline-none text-white transition-all font-medium"
+              className="w-full pl-9 pr-8 py-2 text-sm rounded-md border outline-none transition-colors font-medium"
+              style={{ borderColor: 'var(--border-default)', background: 'var(--surface-secondary)', color: 'var(--text-primary)' }}
+              onFocus={e => e.target.style.borderColor = 'var(--border-focus)'}
+              onBlur={e => e.target.style.borderColor = 'var(--border-default)'}
             />
             {searchQuery && (
-              <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 text-xs">✕</button>
+              <button onClick={() => setSearchQuery('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer" style={{ color: 'var(--text-muted)' }}>
+                <XIcon className="w-3.5 h-3.5" />
+              </button>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setFilterUrgentOnly(!filterUrgentOnly)}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                filterUrgentOnly 
-                  ? 'bg-red-600 text-white shadow-md shadow-red-600/30' 
-                  : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
-              }`}
-            >
-              <span>🚨</span>
-              <span>Urgent Only</span>
-            </button>
-          </div>
+          <button
+            onClick={() => setFilterUrgentOnly(!filterUrgentOnly)}
+            className="px-3 py-2 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap cursor-pointer border"
+            style={{ 
+              background: filterUrgentOnly ? 'var(--danger-500)' : 'var(--surface-secondary)',
+              color: filterUrgentOnly ? 'white' : 'var(--text-secondary)',
+              borderColor: filterUrgentOnly ? 'var(--danger-500)' : 'var(--border-default)'
+            }}
+          >
+            <AlertTriangle className="w-3.5 h-3.5" />
+            <span>Urgent Only</span>
+          </button>
         </div>
 
-        {/* --- ORDERS GRID --- */}
+        {/* --- ORDERS --- */}
         {filteredOrders.length === 0 ? (
-          <div className="bg-slate-950 border border-slate-800 rounded-3xl p-12 sm:p-20 text-center">
-            <span className="text-5xl sm:text-6xl mb-3 block opacity-40">☕</span>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-300 mb-1">Pharmacy queue is clear</h2>
-            <p className="text-slate-500 text-xs sm:text-sm">New prescriptions from doctor consultations will appear here automatically.</p>
+          <div className="rounded-lg border p-12 sm:p-16 text-center" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+            <Package className="w-10 h-10 mx-auto mb-3" style={{ color: 'var(--text-muted)' }} />
+            <h2 className="text-base font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>No pending orders</h2>
+            <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>New prescriptions from doctor consultations will appear here automatically.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredOrders.map(order => (
               <div 
                 key={order.id} 
-                className={`bg-slate-950 border rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden flex flex-col justify-between transition-all hover:border-slate-700 ${
-                  order.isEmergency ? 'border-red-500/60 shadow-[0_0_20px_rgba(239,68,68,0.15)]' : 'border-slate-800'
-                }`}
+                className="rounded-lg border p-4 flex flex-col justify-between transition-colors"
+                style={{ 
+                  background: 'var(--surface-primary)', 
+                  borderColor: order.isEmergency ? 'var(--danger-100)' : 'var(--border-default)' 
+                }}
               >
-                {/* Emergency Flasher */}
+                {/* Urgent badge */}
                 {order.isEmergency && (
-                  <div className="absolute top-0 right-0 bg-red-600 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-bl-lg animate-pulse">
-                    Urgent
+                  <div className="mb-2">
+                    <span className="badge badge--danger text-[10px] font-bold">
+                      <AlertTriangle className="w-3 h-3" />
+                      Urgent
+                    </span>
                   </div>
                 )}
 
-                <div>
+                <div className="mb-3">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-mono font-bold text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20">
-                      Token: {order.tokenNumber}
+                    <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: 'var(--blue-50)', color: 'var(--blue-600)', border: '1px solid var(--blue-100)' }}>
+                      {order.tokenNumber}
                     </span>
-                    <span className="text-[10px] text-slate-500 font-mono">
-                      {order.timeSlot || 'Active OPD'}
+                    <span className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>
+                      {order.timeSlot || 'OPD'}
                     </span>
                   </div>
 
-                  <div className="mb-3">
-                    <h3 className="text-xl font-black text-white leading-tight">{order.patientName}</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">Prescribed by <span className="text-teal-400 font-semibold">{order.doctorName}</span></p>
-                  </div>
+                  <h3 className="text-base font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>{order.patientName}</h3>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
+                    Prescribed by <span className="font-medium" style={{ color: 'var(--blue-600)' }}>{order.doctorName}</span>
+                  </p>
+                </div>
 
-                  {/* Prescription Notes */}
-                  <div className="bg-slate-900 rounded-xl p-3.5 mb-5 border border-slate-800 font-mono text-xs text-slate-200 whitespace-pre-wrap max-h-40 overflow-y-auto leading-relaxed">
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1 font-sans">Prescribed Items:</p>
-                    {order.prescription || "General OPD advice. No medicine detailed."}
-                  </div>
+                {/* Prescription */}
+                <div className="rounded-md p-3 mb-4 border font-mono text-xs whitespace-pre-wrap max-h-36 overflow-y-auto leading-relaxed" style={{ background: 'var(--surface-secondary)', borderColor: 'var(--border-subtle)', color: 'var(--text-secondary)' }}>
+                  <p className="section-header text-[10px] mb-1 font-sans">Prescribed Items</p>
+                  {order.prescription || "General advice. No medicine detailed."}
                 </div>
 
                 <div className="flex gap-2">
                   <button 
                     onClick={() => handleDispense(order)}
-                    className="flex-1 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-black py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm transition-all shadow-lg shadow-teal-500/20 active:scale-95 flex items-center justify-center gap-1.5"
+                    className="flex-1 py-2.5 rounded-md text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                    style={{ background: 'var(--positive-500)', color: 'white' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'var(--positive-600)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'var(--positive-500)'}
                   >
-                    <span>✅</span>
-                    <span>Mark as Dispensed</span>
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Mark Dispensed</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => window.print()}
-                    className="px-3 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-bold transition-colors active:scale-95"
-                    title="Print Pill Envelope / Label"
+                    className="px-3 py-2.5 rounded-md border text-xs font-semibold transition-colors cursor-pointer"
+                    style={{ borderColor: 'var(--border-default)', color: 'var(--text-secondary)', background: 'var(--surface-secondary)' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-tertiary)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'var(--surface-secondary)'}
+                    title="Print Label"
                   >
-                    🖨️
+                    <Printer className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>

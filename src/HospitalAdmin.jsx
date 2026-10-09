@@ -1,16 +1,33 @@
 import { useState } from 'react';
 import { db } from './firebase';
 import { collection, query, getDocs, orderBy, where } from 'firebase/firestore';
+import { 
+  BarChart3, 
+  Users, 
+  Pill, 
+  Clock, 
+  Stethoscope, 
+  Download, 
+  Star,
+  Shield,
+  TrendingUp,
+  TrendingDown,
+  FileSpreadsheet,
+  Loader2,
+  Calendar,
+  CheckCircle2,
+  Building2
+} from 'lucide-react';
 
 export default function HospitalAdmin({ hospitalId }) {
   const [isExporting, setIsExporting] = useState(false);
   const [hospitalName] = useState("ArogyaNext City Hospital");
 
   const stats = [
-    { title: "Patients Today", value: "142", trend: "+12%", icon: "👨‍⚕️" },
-    { title: "Pharmacy Revenue", value: "₹45,200", trend: "+5%", icon: "💊" },
-    { title: "Avg Wait Time", value: "14 mins", trend: "-2 mins", icon: "⏱️" },
-    { title: "Active Doctors", value: "8", trend: "Online", icon: "🩺" }
+    { title: "Patients Today", value: "142", trend: "+12%", trendUp: true, icon: Users },
+    { title: "Pharmacy Revenue", value: "₹45,200", trend: "+5%", trendUp: true, icon: Pill },
+    { title: "Avg Wait Time", value: "14 mins", trend: "-2 mins", trendUp: false, icon: Clock },
+    { title: "Active Doctors", value: "8", trend: "Online", trendUp: null, icon: Stethoscope }
   ];
 
   // --- CSV EXPORT LOGIC ---
@@ -84,7 +101,7 @@ export default function HospitalAdmin({ hospitalId }) {
       link.click();
       document.body.removeChild(link);
 
-      alert(`✅ Successfully exported ${exportData.length} records!`);
+      alert(`Successfully exported ${exportData.length} records.`);
     } catch (error) {
       console.error("Export failed:", error);
       alert("Failed to export data. Check console for details.");
@@ -92,204 +109,178 @@ export default function HospitalAdmin({ hospitalId }) {
     setIsExporting(false);
   };
 
+  const departments = [
+    { name: 'General Medicine & Chest', percent: 42, count: 60, color: 'var(--blue-600)' },
+    { name: 'Pediatrics & Child Care', percent: 24, count: 34, color: 'var(--blue-500)' },
+    { name: 'Orthopedics & Joint Care', percent: 18, count: 26, color: 'var(--positive-500)' },
+    { name: 'ENT & Ophthalmology', percent: 16, count: 22, color: 'var(--warning-500)' },
+  ];
+
+  const exportOptions = [
+    { label: 'End of Day', days: 1, icon: Calendar },
+    { label: 'Last 7 Days', days: 7, icon: Calendar },
+    { label: 'Last Month', days: 30, icon: Calendar },
+    { label: '6 Months', days: 180, icon: Calendar },
+    { label: 'Last Year', days: 365, icon: Calendar },
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-900 p-3 sm:p-6 md:p-8 font-sans text-slate-300">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 font-sans" style={{ background: 'var(--surface-app)' }}>
       
-      <div className="mb-6 sm:mb-8 border-b border-slate-800 pb-4 sm:pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3">
+      {/* --- HEADER --- */}
+      <div className="mb-5 sm:mb-6 border-b pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3" style={{ borderColor: 'var(--border-subtle)' }}>
         <div>
-          <p className="text-blue-500 font-bold uppercase tracking-widest text-xs sm:text-sm mb-0.5 sm:mb-1">Director's Hub</p>
-          <h1 className="text-2xl sm:text-4xl font-black text-white">{hospitalName}</h1>
+          <p className="text-xs font-semibold uppercase mb-0.5" style={{ color: 'var(--blue-600)', letterSpacing: '0.04em' }}>Analytics</p>
+          <h1 className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{hospitalName}</h1>
         </div>
-        <div className="text-left sm:text-right">
-          <p className="text-slate-500 text-xs sm:text-sm mb-1">Status: <span className="text-emerald-500 font-bold">● Secure</span></p>
-          <span className="bg-slate-800 text-slate-400 px-2.5 py-1 rounded text-[10px] sm:text-xs font-bold uppercase tracking-widest border border-slate-700">
-             Workspace: {hospitalId}
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-medium flex items-center gap-1.5" style={{ color: 'var(--text-tertiary)' }}>
+            <span className="status-dot status-dot--active"></span>
+            Operational
+          </span>
+          <span className="px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold border" style={{ background: 'var(--surface-secondary)', borderColor: 'var(--border-default)', color: 'var(--text-secondary)' }}>
+            {hospitalId}
           </span>
         </div>
       </div>
 
-      {/* Top Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
-        {stats.map((stat, index) => (
-          <div key={index} className="bg-slate-950 border border-slate-800 p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-lg">
-            <div className="flex justify-between items-start mb-2 sm:mb-4">
-              <span className="text-2xl sm:text-3xl">{stat.icon}</span>
-              <span className={`text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg ${stat.trend.includes('+') ? 'bg-emerald-500/10 text-emerald-400' : stat.trend === 'Online' ? 'bg-blue-500/10 text-blue-400' : 'bg-red-500/10 text-red-400'}`}>
-                {stat.trend}
-              </span>
+      {/* --- STATS ROW --- */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5 sm:mb-6">
+        {stats.map((stat, index) => {
+          const Icon = stat.icon;
+          return (
+            <div key={index} className="p-3 sm:p-4 rounded-lg border" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+              <div className="flex justify-between items-start mb-2">
+                <div className="w-8 h-8 rounded-md flex items-center justify-center" style={{ background: 'var(--blue-50)' }}>
+                  <Icon className="w-4 h-4" style={{ color: 'var(--blue-600)' }} />
+                </div>
+                <span className="badge text-[10px]" style={{
+                  background: stat.trendUp === true ? 'var(--positive-50)' : stat.trendUp === false ? 'var(--danger-50)' : 'var(--blue-50)',
+                  color: stat.trendUp === true ? 'var(--positive-600)' : stat.trendUp === false ? 'var(--danger-600)' : 'var(--blue-600)',
+                  border: stat.trendUp === true ? '1px solid var(--positive-100)' : stat.trendUp === false ? '1px solid var(--danger-100)' : '1px solid var(--blue-100)'
+                }}>
+                  {stat.trendUp === true && <TrendingUp className="w-3 h-3" />}
+                  {stat.trendUp === false && <TrendingDown className="w-3 h-3" />}
+                  {stat.trend}
+                </span>
+              </div>
+              <p className="text-[11px] font-semibold uppercase" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.03em' }}>{stat.title}</p>
+              <p className="text-lg sm:text-xl font-bold mt-0.5" style={{ color: 'var(--text-primary)' }}>{stat.value}</p>
             </div>
-            <h3 className="text-slate-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-0.5 sm:mb-1">{stat.title}</h3>
-            <p className="text-xl sm:text-3xl font-black text-white">{stat.value}</p>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* --- CLINICAL EFFICIENCY & DEPARTMENT BREAKDOWN --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8">
+      {/* --- DEPARTMENT & QUALITY --- */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5 sm:mb-6">
         
-        {/* Department Footfall Progress Bars */}
-        <div className="lg:col-span-2 bg-slate-950 border border-slate-800 p-5 sm:p-7 rounded-2xl sm:rounded-3xl shadow-lg">
-          <div className="flex justify-between items-center mb-5 pb-3 border-b border-slate-800">
+        {/* Department Breakdown */}
+        <div className="lg:col-span-2 p-4 sm:p-5 rounded-lg border" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+          <div className="flex justify-between items-center mb-4 pb-3 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
             <div>
-              <h3 className="text-base sm:text-lg font-black text-white">OPD Footfall by Department</h3>
-              <p className="text-xs text-slate-400">Real-time consultation load distribution across specialty clinics</p>
+              <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>OPD Footfall by Department</h3>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>Consultation load distribution</p>
             </div>
-            <span className="text-xs font-mono font-bold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20">
-              Live Triage Data
-            </span>
+            <span className="badge badge--blue text-[10px]">Live Data</span>
           </div>
 
           <div className="space-y-4">
-            <div>
-              <div className="flex justify-between text-xs font-bold mb-1">
-                <span className="text-slate-200">🩺 General Medicine & Chest</span>
-                <span className="text-blue-400">42% (60 Patients)</span>
+            {departments.map((dept) => (
+              <div key={dept.name}>
+                <div className="flex justify-between text-xs font-medium mb-1">
+                  <span style={{ color: 'var(--text-primary)' }}>{dept.name}</span>
+                  <span style={{ color: 'var(--text-tertiary)' }}>{dept.percent}% ({dept.count} patients)</span>
+                </div>
+                <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface-tertiary)' }}>
+                  <div className="h-full rounded-full transition-all" style={{ width: `${dept.percent}%`, background: dept.color }}></div>
+                </div>
               </div>
-              <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
-                <div className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full" style={{ width: '42%' }}></div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-xs font-bold mb-1">
-                <span className="text-slate-200">👶 Pediatrics & Child Care</span>
-                <span className="text-purple-400">24% (34 Patients)</span>
-              </div>
-              <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
-                <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full" style={{ width: '24%' }}></div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-xs font-bold mb-1">
-                <span className="text-slate-200">🦴 Orthopedics & Joint Care</span>
-                <span className="text-emerald-400">18% (26 Patients)</span>
-              </div>
-              <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
-                <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full" style={{ width: '18%' }}></div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-xs font-bold mb-1">
-                <span className="text-slate-200">👂 ENT & Ophthalmology</span>
-                <span className="text-amber-400">16% (22 Patients)</span>
-              </div>
-              <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
-                <div className="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full" style={{ width: '16%' }}></div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Quality & SLA Benchmarks */}
-        <div className="bg-slate-950 border border-slate-800 p-5 sm:p-7 rounded-2xl sm:rounded-3xl shadow-lg flex flex-col justify-between">
+        {/* Quality Score */}
+        <div className="p-4 sm:p-5 rounded-lg border flex flex-col justify-between" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
           <div>
-            <h3 className="text-base sm:text-lg font-black text-white mb-1">Hospital Quality Score</h3>
-            <p className="text-xs text-slate-400 mb-5">Measured by patient reviews and queue adherence</p>
+            <h3 className="text-sm font-semibold mb-0.5" style={{ color: 'var(--text-primary)' }}>Quality Score</h3>
+            <p className="text-xs mb-4" style={{ color: 'var(--text-tertiary)' }}>Patient satisfaction & compliance</p>
 
-            <div className="space-y-3.5">
-              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
-                <div className="flex items-center gap-2.5">
-                  <span className="text-xl">⭐</span>
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between p-2.5 rounded-md border" style={{ background: 'var(--surface-secondary)', borderColor: 'var(--border-subtle)' }}>
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4" style={{ color: 'var(--warning-500)' }} />
                   <div>
-                    <p className="text-xs font-bold text-white">Patient Rating</p>
-                    <p className="text-[10px] text-slate-400">Post-visit SMS feedback</p>
+                    <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>Patient Rating</p>
+                    <p className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>Post-visit feedback</p>
                   </div>
                 </div>
-                <span className="text-sm font-black text-amber-400">4.9 / 5.0</span>
+                <span className="text-sm font-bold" style={{ color: 'var(--warning-500)' }}>4.9 / 5.0</span>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
-                <div className="flex items-center gap-2.5">
-                  <span className="text-xl">⚡</span>
+              <div className="flex items-center justify-between p-2.5 rounded-md border" style={{ background: 'var(--surface-secondary)', borderColor: 'var(--border-subtle)' }}>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4" style={{ color: 'var(--positive-500)' }} />
                   <div>
-                    <p className="text-xs font-bold text-white">Zero Wait SLA</p>
-                    <p className="text-[10px] text-slate-400">Seen within 15 mins</p>
+                    <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>Zero Wait SLA</p>
+                    <p className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>Seen within 15 mins</p>
                   </div>
                 </div>
-                <span className="text-sm font-black text-emerald-400">92.4%</span>
+                <span className="text-sm font-bold" style={{ color: 'var(--positive-500)' }}>92.4%</span>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
-                <div className="flex items-center gap-2.5">
-                  <span className="text-xl">🇮🇳</span>
+              <div className="flex items-center justify-between p-2.5 rounded-md border" style={{ background: 'var(--surface-secondary)', borderColor: 'var(--border-subtle)' }}>
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4" style={{ color: 'var(--blue-600)' }} />
                   <div>
-                    <p className="text-xs font-bold text-white">ABDM Digital Compliance</p>
-                    <p className="text-[10px] text-slate-400">National Health ID Sync</p>
+                    <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>ABDM Compliance</p>
+                    <p className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>National Health ID</p>
                   </div>
                 </div>
-                <span className="text-sm font-black text-blue-400">100% Ready</span>
+                <span className="text-sm font-bold" style={{ color: 'var(--blue-600)' }}>100%</span>
               </div>
             </div>
           </div>
 
-          <p className="text-[11px] text-slate-500 mt-4 text-center font-medium">
+          <p className="text-[10px] mt-3 text-center" style={{ color: 'var(--text-muted)' }}>
             Automated compliance audits updated continuously.
           </p>
         </div>
-
       </div>
 
-      {/* Export Section */}
-      <div className="bg-slate-950 border border-slate-800 p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-lg">
-        <h2 className="text-xl sm:text-2xl font-black text-white mb-2 flex items-center">
-          <span className="mr-2.5 sm:mr-3">📊</span> Data Export & Reports
+      {/* --- EXPORT --- */}
+      <div className="p-4 sm:p-6 rounded-lg border" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+        <h2 className="text-sm font-semibold mb-1 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+          <FileSpreadsheet className="w-4 h-4" style={{ color: 'var(--blue-600)' }} />
+          Data Export
         </h2>
-        <p className="text-slate-400 mb-6 sm:mb-8 text-xs sm:text-sm max-w-2xl leading-relaxed">
-          Download CSV reports of all hospital operations, patient footfall, and pharmacy statuses. Open directly in Microsoft Excel or Google Sheets.
+        <p className="text-xs mb-4 max-w-2xl" style={{ color: 'var(--text-tertiary)' }}>
+          Download CSV reports of operations, patient footfall, and pharmacy statuses.
         </p>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-          <button 
-            onClick={() => handleExportData(1, 'End of Day')}
-            disabled={isExporting}
-            className="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white font-bold py-3.5 sm:py-4 px-3 sm:px-4 rounded-xl text-xs sm:text-sm transition-colors flex flex-col items-center justify-center gap-1.5 sm:gap-2 group disabled:opacity-50 active:scale-95"
-          >
-            <span className="text-xl sm:text-2xl group-hover:-translate-y-0.5 transition-transform">🌅</span>
-            End of Day
-          </button>
-
-          <button 
-            onClick={() => handleExportData(7, 'Last 7 Days')}
-            disabled={isExporting}
-            className="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white font-bold py-3.5 sm:py-4 px-3 sm:px-4 rounded-xl text-xs sm:text-sm transition-colors flex flex-col items-center justify-center gap-1.5 sm:gap-2 group disabled:opacity-50 active:scale-95"
-          >
-            <span className="text-xl sm:text-2xl group-hover:-translate-y-0.5 transition-transform">📅</span>
-            Last 7 Days
-          </button>
-
-          <button 
-            onClick={() => handleExportData(30, 'Last 1 Month')}
-            disabled={isExporting}
-            className="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white font-bold py-3.5 sm:py-4 px-3 sm:px-4 rounded-xl text-xs sm:text-sm transition-colors flex flex-col items-center justify-center gap-1.5 sm:gap-2 group disabled:opacity-50 active:scale-95"
-          >
-            <span className="text-xl sm:text-2xl group-hover:-translate-y-0.5 transition-transform">📆</span>
-            Last 1 Month
-          </button>
-
-          <button 
-            onClick={() => handleExportData(180, 'Last 6 Months')}
-            disabled={isExporting}
-            className="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white font-bold py-3.5 sm:py-4 px-3 sm:px-4 rounded-xl text-xs sm:text-sm transition-colors flex flex-col items-center justify-center gap-1.5 sm:gap-2 group disabled:opacity-50 active:scale-95"
-          >
-            <span className="text-xl sm:text-2xl group-hover:-translate-y-0.5 transition-transform">📈</span>
-            Last 6 Months
-          </button>
-
-          <button 
-            onClick={() => handleExportData(365, 'Last 1 Year')}
-            disabled={isExporting}
-            className="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white font-bold py-3.5 sm:py-4 px-3 sm:px-4 rounded-xl text-xs sm:text-sm transition-colors flex flex-col items-center justify-center gap-1.5 sm:gap-2 group disabled:opacity-50 col-span-2 sm:col-span-1 active:scale-95"
-          >
-            <span className="text-xl sm:text-2xl group-hover:-translate-y-0.5 transition-transform">🏢</span>
-            Last 1 Year
-          </button>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+          {exportOptions.map((opt) => {
+            const Icon = opt.icon;
+            return (
+              <button 
+                key={opt.label}
+                onClick={() => handleExportData(opt.days, opt.label)}
+                disabled={isExporting}
+                className="border py-3 px-3 rounded-md text-xs font-medium transition-colors flex flex-col items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                style={{ borderColor: 'var(--border-default)', color: 'var(--text-secondary)', background: 'var(--surface-secondary)' }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'var(--blue-50)'; e.currentTarget.style.borderColor = 'var(--blue-200)'; e.currentTarget.style.color = 'var(--blue-600)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface-secondary)'; e.currentTarget.style.borderColor = 'var(--border-default)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+              >
+                <Download className="w-4 h-4" />
+                {opt.label}
+              </button>
+            );
+          })}
         </div>
 
         {isExporting && (
-          <div className="mt-4 sm:mt-6 text-center text-blue-400 text-xs sm:text-sm font-bold animate-pulse">
-            Generating Secure CSV Report... Please wait.
+          <div className="mt-4 text-center text-xs font-medium flex items-center justify-center gap-2" style={{ color: 'var(--blue-600)' }}>
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            Generating report...
           </div>
         )}
       </div>

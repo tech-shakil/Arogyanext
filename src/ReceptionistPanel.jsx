@@ -1,6 +1,23 @@
 import { useState, useEffect } from 'react';
 import { db } from './firebase';
 import { collection, addDoc, getDocs, onSnapshot, query, orderBy, where, doc, updateDoc } from 'firebase/firestore';
+import { 
+  Users, 
+  AlertTriangle, 
+  Stethoscope, 
+  Clock, 
+  Calendar, 
+  Search, 
+  X, 
+  CheckCircle2, 
+  UserPlus, 
+  Loader2, 
+  FileText,
+  Activity,
+  Flame,
+  Building2,
+  Trash2
+} from 'lucide-react';
 
 export default function ReceptionistPanel({ hospitalId }) {
   const [patientName, setPatientName] = useState('');
@@ -8,10 +25,10 @@ export default function ReceptionistPanel({ hospitalId }) {
   const [symptoms, setSymptoms] = useState('');
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [isEmergency, setIsEmergency] = useState(false);
-  
+
   const [appointmentDate, setAppointmentDate] = useState(new Date().toISOString().split('T')[0]);
   const [timeSlot, setTimeSlot] = useState('');
-  
+
   const [doctorsList, setDoctorsList] = useState([]);
   const [todaysPatients, setTodaysPatients] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,20 +37,19 @@ export default function ReceptionistPanel({ hospitalId }) {
   const [filterEmergencyOnly, setFilterEmergencyOnly] = useState(false);
 
   const symptomPresets = [
-    "Fever 🌡️", "Cough & Cold 😷", "Headache 🤕", "Chest Pain 🫀", 
-    "Stomach Pain 🤢", "Diabetes 🩸", "Hypertension 💓", "Injury 🩹"
+    "Fever", "Cough & Cold", "Headache", "Chest Pain",
+    "Abdominal Pain", "Diabetes Review", "Hypertension", "Acute Trauma"
   ];
 
-  const handlePresetSymptom = (chip) => {
-    const cleanChip = chip.split(' ')[0];
-    if (symptoms.includes(cleanChip)) return;
-    setSymptoms(prev => prev ? `${prev}, ${cleanChip}` : cleanChip);
+  const handlePresetSymptom = (preset) => {
+    if (symptoms.toLowerCase().includes(preset.toLowerCase())) return;
+    setSymptoms(prev => prev ? `${prev}, ${preset}` : preset);
   };
 
   const generateTimeSlots = () => {
     return [
-      "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", 
-      "12:00 PM", "12:30 PM", "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM", 
+      "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
+      "12:00 PM", "12:30 PM", "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM",
       "04:00 PM", "04:30 PM", "05:00 PM"
     ];
   };
@@ -41,26 +57,30 @@ export default function ReceptionistPanel({ hospitalId }) {
   useEffect(() => {
     if (!hospitalId) return;
     const fetchDoctors = async () => {
-      const q = query(collection(db, 'doctors'), where("hospitalId", "==", hospitalId));
-      const querySnapshot = await getDocs(q);
-      setDoctorsList(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      try {
+        const q = query(collection(db, 'doctors'), where("hospitalId", "==", hospitalId));
+        const querySnapshot = await getDocs(q);
+        setDoctorsList(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      } catch (err) {
+        console.error("Error fetching doctors:", err);
+      }
     };
     fetchDoctors();
   }, [hospitalId]);
 
   useEffect(() => {
     if (!hospitalId) return;
-    
+
     const todayStr = new Date().toISOString().split('T')[0];
 
     const q = query(
-      collection(db, 'appointments'), 
-      where("hospitalId", "==", hospitalId), 
+      collection(db, 'appointments'),
+      where("hospitalId", "==", hospitalId),
       where("status", "==", "Waiting"),
-      where("appointmentDate", "==", todayStr), 
+      where("appointmentDate", "==", todayStr),
       orderBy('timestamp', 'asc')
     );
-    
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setTodaysPatients(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
@@ -70,7 +90,7 @@ export default function ReceptionistPanel({ hospitalId }) {
   const handleSlotBooking = async (e) => {
     e.preventDefault();
     if (!timeSlot && !isEmergency) {
-      alert("Please select a time slot.");
+      alert("Please select an appointment time slot.");
       return;
     }
 
@@ -81,30 +101,35 @@ export default function ReceptionistPanel({ hospitalId }) {
 
       await addDoc(collection(db, 'appointments'), {
         tokenNumber: generatedToken,
-        patientName,
-        patientAge,
-        symptoms,
+        patientName: patientName.trim(),
+        patientAge: patientAge.trim(),
+        symptoms: symptoms.trim(),
         doctorName: selectedDoctor,
         hospitalId: hospitalId,
         isEmergency: isEmergency,
         status: "Waiting",
-        appointmentDate: appointmentDate, 
-        timeSlot: isEmergency ? "IMMEDIATE" : timeSlot, 
-        timestamp: new Date() 
+        appointmentDate: appointmentDate,
+        timeSlot: isEmergency ? "IMMEDIATE" : timeSlot,
+        timestamp: new Date()
       });
 
-      setSuccessMessage(`Booked for ${appointmentDate} at ${isEmergency ? 'IMMEDIATE' : timeSlot}. Token: ${generatedToken}`);
-      setPatientName(''); setPatientAge(''); setSymptoms(''); setTimeSlot(''); setIsEmergency(false);
+      setSuccessMessage(`Appointment confirmed for ${patientName.trim()} (${generatedToken}) at ${isEmergency ? 'IMMEDIATE (Priority)' : timeSlot}.`);
+      setPatientName(''); 
+      setPatientAge(''); 
+      setSymptoms(''); 
+      setTimeSlot(''); 
+      setIsEmergency(false);
       setTimeout(() => setSuccessMessage(''), 5000);
     } catch (error) {
-      console.error("Error booking:", error);
+      console.error("Error booking appointment:", error);
+      alert("Failed to register appointment. Please check connection.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleCancelAppointment = async (appointmentId) => {
-    const isConfirmed = window.confirm("Are you sure you want to cancel this appointment? This cannot be undone.");
+  const handleCancelAppointment = async (appointmentId, pName) => {
+    const isConfirmed = window.confirm(`Cancel OPD appointment for ${pName || 'this patient'}? This will remove them from the queue.`);
     if (!isConfirmed) return;
 
     try {
@@ -122,8 +147,8 @@ export default function ReceptionistPanel({ hospitalId }) {
   // Filter patients by search & emergency filter
   const filteredPatients = todaysPatients.filter(patient => {
     const q = searchQuery.toLowerCase().trim();
-    const matchesSearch = !q || 
-      patient.patientName?.toLowerCase().includes(q) || 
+    const matchesSearch = !q ||
+      patient.patientName?.toLowerCase().includes(q) ||
       patient.tokenNumber?.toLowerCase().includes(q);
     const matchesEmergency = !filterEmergencyOnly || patient.isEmergency;
     return matchesSearch && matchesEmergency;
@@ -139,355 +164,416 @@ export default function ReceptionistPanel({ hospitalId }) {
   const emergencyCount = todaysPatients.filter(p => p.isEmergency).length;
 
   return (
-    <div className="min-h-screen bg-slate-50 p-3 sm:p-6 md:p-8 font-sans">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 font-sans" style={{ background: 'var(--surface-app)' }}>
       <div className="max-w-7xl mx-auto">
-        
-        {/* --- TOP HEADER & CLINIC METRICS --- */}
-        <div className="mb-6 sm:mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+
+        {/* --- HEADER --- */}
+        <div className="mb-5 sm:mb-6 border-b pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3" style={{ borderColor: 'var(--border-subtle)' }}>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Front Desk Control Center</h1>
-              <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-blue-200">OPD Active</span>
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--blue-600)', letterSpacing: '0.04em' }}>
+                Front Desk Operations
+              </p>
+              <span className="badge badge--positive text-[10px]">
+                <Activity className="w-3 h-3" />
+                OPD Active
+              </span>
             </div>
-            <p className="text-slate-500 mt-1 text-xs sm:text-sm">Instant patient check-in, real-time doctor assignment & slot queue management</p>
+            <h1 className="text-xl sm:text-2xl font-bold mt-0.5" style={{ color: 'var(--text-primary)' }}>Patient Intake & Triage Desk</h1>
           </div>
 
-          <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
-            <div className="bg-white border border-slate-200 px-3 py-1.5 rounded-xl shadow-sm text-left">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Facility Code</span>
-              <span className="text-xs sm:text-sm font-mono font-black text-slate-800">{hospitalId}</span>
+          <div className="flex items-center gap-3">
+            <div className="text-right hidden sm:block">
+              <span className="text-[10px] uppercase font-semibold block" style={{ color: 'var(--text-muted)', letterSpacing: '0.04em' }}>Hospital Facility</span>
+              <span className="text-xs font-mono font-bold" style={{ color: 'var(--text-secondary)' }}>{hospitalId}</span>
             </div>
-            <div className="bg-white border border-slate-200 px-3 py-1.5 rounded-xl shadow-sm text-left">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Today's Date</span>
-              <span className="text-xs sm:text-sm font-bold text-slate-700">{new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+            <div className="px-3 py-1.5 rounded-md border text-xs font-medium" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)', color: 'var(--text-secondary)' }}>
+              {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
             </div>
           </div>
         </div>
 
         {/* --- QUICK STATS ROW --- */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <div className="bg-white p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5 sm:mb-6">
+          <div className="p-3.5 sm:p-4 rounded-lg border flex items-center justify-between" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
             <div>
-              <p className="text-[10px] sm:text-xs font-bold uppercase text-slate-400 tracking-wider">Waiting Today</p>
-              <p className="text-xl sm:text-2xl font-black text-slate-800 mt-0.5">{todaysPatients.length}</p>
+              <p className="text-[11px] font-semibold uppercase" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.03em' }}>Waiting Today</p>
+              <p className="text-xl sm:text-2xl font-bold mt-0.5" style={{ color: 'var(--text-primary)' }}>{todaysPatients.length}</p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">⏳</div>
+            <div className="w-9 h-9 rounded-md flex items-center justify-center" style={{ background: 'var(--blue-50)' }}>
+              <Users className="w-4 h-4" style={{ color: 'var(--blue-600)' }} />
+            </div>
           </div>
 
-          <div className="bg-white p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div className="p-3.5 sm:p-4 rounded-lg border flex items-center justify-between" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
             <div>
-              <p className="text-[10px] sm:text-xs font-bold uppercase text-slate-400 tracking-wider">Emergency Walk-ins</p>
-              <p className="text-xl sm:text-2xl font-black text-red-600 mt-0.5">{emergencyCount}</p>
+              <p className="text-[11px] font-semibold uppercase" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.03em' }}>Urgent Triage</p>
+              <p className="text-xl sm:text-2xl font-bold mt-0.5" style={{ color: emergencyCount > 0 ? 'var(--danger-500)' : 'var(--text-primary)' }}>{emergencyCount}</p>
             </div>
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${emergencyCount > 0 ? 'bg-red-50 text-red-600 animate-pulse' : 'bg-slate-50 text-slate-400'}`}>🚨</div>
+            <div className="w-9 h-9 rounded-md flex items-center justify-center" style={{ background: emergencyCount > 0 ? 'var(--danger-50)' : 'var(--surface-secondary)' }}>
+              <AlertTriangle className="w-4 h-4" style={{ color: emergencyCount > 0 ? 'var(--danger-500)' : 'var(--text-muted)' }} />
+            </div>
           </div>
 
-          <div className="bg-white p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div className="p-3.5 sm:p-4 rounded-lg border flex items-center justify-between" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
             <div>
-              <p className="text-[10px] sm:text-xs font-bold uppercase text-slate-400 tracking-wider">Doctors On Duty</p>
-              <p className="text-xl sm:text-2xl font-black text-emerald-600 mt-0.5">{doctorsList.length}</p>
+              <p className="text-[11px] font-semibold uppercase" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.03em' }}>Doctors on Duty</p>
+              <p className="text-xl sm:text-2xl font-bold mt-0.5" style={{ color: 'var(--positive-500)' }}>{doctorsList.length}</p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">🩺</div>
+            <div className="w-9 h-9 rounded-md flex items-center justify-center" style={{ background: 'var(--positive-50)' }}>
+              <Stethoscope className="w-4 h-4" style={{ color: 'var(--positive-500)' }} />
+            </div>
           </div>
 
-          <div className="bg-white p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div className="p-3.5 sm:p-4 rounded-lg border flex items-center justify-between" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
             <div>
-              <p className="text-[10px] sm:text-xs font-bold uppercase text-slate-400 tracking-wider">Next Slot Time</p>
-              <p className="text-base sm:text-lg font-black text-indigo-600 mt-0.5">{generateTimeSlots()[0]}</p>
+              <p className="text-[11px] font-semibold uppercase" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.03em' }}>Next Available Slot</p>
+              <p className="text-sm sm:text-base font-bold mt-1" style={{ color: 'var(--blue-600)' }}>{generateTimeSlots()[0]}</p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg">⏱️</div>
+            <div className="w-9 h-9 rounded-md flex items-center justify-center" style={{ background: 'var(--blue-50)' }}>
+              <Clock className="w-4 h-4" style={{ color: 'var(--blue-600)' }} />
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 sm:gap-8">
-          
-          {/* --- SCHEDULE APPOINTMENT FORM --- */}
-          <div className="xl:col-span-1 bg-white p-5 sm:p-7 rounded-2xl shadow-sm border border-slate-200/90 h-fit">
-            <h2 className="text-base sm:text-lg font-black text-slate-800 mb-4 pb-3 border-b border-slate-100 flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <span className="bg-indigo-100 text-indigo-600 w-7 h-7 rounded-lg flex items-center justify-center text-xs">📅</span>
-                <span>Book Patient Check-In</span>
-              </span>
-              {isEmergency && (
-                <span className="bg-red-500 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded tracking-wider animate-pulse">
-                  Emergency Mode
-                </span>
-              )}
-            </h2>
+        {/* --- MAIN WORKSPACE GRID --- */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 sm:gap-6">
 
-            <form onSubmit={handleSlotBooking} className="space-y-4 sm:space-y-5">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Patient Name <span className="text-red-500">*</span>
-                </label>
-                <input 
-                  type="text" required value={patientName} onChange={(e) => setPatientName(e.target.value)} 
-                  placeholder="e.g. John Doe" 
-                  className="w-full px-4 py-3 text-sm rounded-xl border-2 border-slate-300 bg-slate-50/70 hover:bg-white focus:bg-white text-slate-900 font-semibold placeholder:text-slate-500 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none transition-all shadow-sm" 
-                />
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="sm:col-span-1">
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Age <span className="text-red-500">*</span>
-                  </label>
-                  <input 
-                    type="number" required value={patientAge} onChange={(e) => setPatientAge(e.target.value)} 
-                    placeholder="45" 
-                    className="w-full px-4 py-3 text-sm rounded-xl border-2 border-slate-300 bg-slate-50/70 hover:bg-white focus:bg-white text-slate-900 font-semibold placeholder:text-slate-500 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none transition-all shadow-sm" 
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Symptoms
-                  </label>
-                  <input 
-                    type="text" value={symptoms} onChange={(e) => setSymptoms(e.target.value)} 
-                    placeholder="Fever, cough, etc." 
-                    className="w-full px-4 py-3 text-sm rounded-xl border-2 border-slate-300 bg-slate-50/70 hover:bg-white focus:bg-white text-slate-900 font-semibold placeholder:text-slate-500 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none transition-all shadow-sm" 
-                  />
-                </div>
+          {/* PATIENT INTAKE FORM */}
+          <div className="xl:col-span-1">
+            <div className="p-4 sm:p-5 rounded-lg border" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+              <div className="flex items-center justify-between mb-4 pb-3 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
+                <h2 className="text-sm font-semibold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                  <UserPlus className="w-4 h-4" style={{ color: 'var(--blue-600)' }} />
+                  Register Patient Check-In
+                </h2>
+                {isEmergency && (
+                  <span className="badge badge--danger text-[10px]">
+                    <Flame className="w-3 h-3" />
+                    Priority Mode
+                  </span>
+                )}
               </div>
 
-              {/* 1-Tap Symptom Suggestion Chips */}
-              <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">⚡ 1-Tap Quick Symptoms:</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {symptomPresets.map((chip) => (
-                    <button
-                      key={chip}
-                      type="button"
-                      onClick={() => handlePresetSymptom(chip)}
-                      className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 border border-slate-200 transition-all active:scale-95 text-slate-700 shadow-xs"
-                    >
-                      +{chip}
-                    </button>
-                  ))}
+              <form onSubmit={handleSlotBooking} className="space-y-3.5">
+                <div>
+                  <label className="block text-[11px] font-semibold uppercase mb-1" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.03em' }}>
+                    Patient Full Name <span style={{ color: 'var(--danger-500)' }}>*</span>
+                  </label>
+                  <input
+                    type="text" required value={patientName} onChange={(e) => setPatientName(e.target.value)}
+                    placeholder="e.g. Rajesh Kumar"
+                    className="w-full px-3 py-2 rounded-md border outline-none text-sm transition-colors font-medium"
+                    style={{ borderColor: 'var(--border-default)', background: 'var(--surface-secondary)', color: 'var(--text-primary)' }}
+                    onFocus={e => e.target.style.borderColor = 'var(--border-focus)'}
+                    onBlur={e => e.target.style.borderColor = 'var(--border-default)'}
+                  />
                 </div>
-              </div>
-              
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Assign to Doctor <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <select 
-                    required value={selectedDoctor} onChange={(e) => setSelectedDoctor(e.target.value)} 
-                    className="w-full px-4 py-3 text-sm rounded-xl border-2 border-slate-300 bg-slate-50/70 hover:bg-white focus:bg-white text-slate-900 font-semibold focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none transition-all shadow-sm cursor-pointer appearance-none pr-10"
+
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="col-span-1">
+                    <label className="block text-[11px] font-semibold uppercase mb-1" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.03em' }}>
+                      Age <span style={{ color: 'var(--danger-500)' }}>*</span>
+                    </label>
+                    <input
+                      type="number" required value={patientAge} onChange={(e) => setPatientAge(e.target.value)}
+                      placeholder="42"
+                      className="w-full px-3 py-2 rounded-md border outline-none text-sm transition-colors font-medium"
+                      style={{ borderColor: 'var(--border-default)', background: 'var(--surface-secondary)', color: 'var(--text-primary)' }}
+                      onFocus={e => e.target.style.borderColor = 'var(--border-focus)'}
+                      onBlur={e => e.target.style.borderColor = 'var(--border-default)'}
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[11px] font-semibold uppercase mb-1" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.03em' }}>
+                      Primary Symptoms
+                    </label>
+                    <input
+                      type="text" value={symptoms} onChange={(e) => setSymptoms(e.target.value)}
+                      placeholder="Fever, cough, body pain..."
+                      className="w-full px-3 py-2 rounded-md border outline-none text-sm transition-colors font-medium"
+                      style={{ borderColor: 'var(--border-default)', background: 'var(--surface-secondary)', color: 'var(--text-primary)' }}
+                      onFocus={e => e.target.style.borderColor = 'var(--border-focus)'}
+                      onBlur={e => e.target.style.borderColor = 'var(--border-default)'}
+                    />
+                  </div>
+                </div>
+
+                {/* Quick Clinical Symptom Tags */}
+                <div className="p-2.5 rounded-md border" style={{ background: 'var(--surface-secondary)', borderColor: 'var(--border-subtle)' }}>
+                  <span className="text-[10px] font-semibold uppercase block mb-1.5" style={{ color: 'var(--text-muted)', letterSpacing: '0.04em' }}>
+                    Quick Symptom Tags
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {symptomPresets.map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => handlePresetSymptom(preset)}
+                        className="px-2 py-0.5 rounded text-[11px] font-medium border transition-colors cursor-pointer"
+                        style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)', color: 'var(--text-secondary)' }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--blue-500)'; e.currentTarget.style.color = 'var(--blue-600)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-default)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+                      >
+                        +{preset}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold uppercase mb-1" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.03em' }}>
+                    Assign to Physician <span style={{ color: 'var(--danger-500)' }}>*</span>
+                  </label>
+                  <select
+                    required value={selectedDoctor} onChange={(e) => setSelectedDoctor(e.target.value)}
+                    className="w-full px-3 py-2 rounded-md border outline-none text-sm transition-colors font-medium cursor-pointer"
+                    style={{ borderColor: 'var(--border-default)', background: 'var(--surface-secondary)', color: 'var(--text-primary)' }}
                   >
-                    <option value="" disabled className="text-slate-400 font-normal">-- Select Doctor --</option>
+                    <option value="" disabled>-- Select Doctor --</option>
                     {doctorsList.map((doc) => (
-                      <option key={doc.id} value={doc.name} className="text-slate-900 font-medium">
-                        {doc.name} ({doc.specialty || 'General'})
+                      <option key={doc.id} value={doc.name}>
+                        {doc.name} ({doc.specialty || 'General OPD'})
                       </option>
                     ))}
                   </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-500">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                  </div>
                 </div>
-              </div>
 
-              <div className="border-t border-slate-200/80 pt-4 space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Appointment Date <span className="text-red-500">*</span>
-                  </label>
-                  <input 
-                    type="date" required value={appointmentDate} onChange={(e) => setAppointmentDate(e.target.value)} 
-                    className="w-full px-4 py-3 text-sm rounded-xl border-2 border-slate-300 bg-slate-50/70 hover:bg-white focus:bg-white text-slate-900 font-semibold focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none transition-all shadow-sm" 
-                  />
-                </div>
-                
-                {!isEmergency && (
+                <div className="border-t pt-3 space-y-3" style={{ borderColor: 'var(--border-subtle)' }}>
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Select Time Slot <span className="text-red-500">*</span>
+                    <label className="block text-[11px] font-semibold uppercase mb-1" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.03em' }}>
+                      Appointment Date <span style={{ color: 'var(--danger-500)' }}>*</span>
                     </label>
-                    <div className="relative">
-                      <select 
-                        required value={timeSlot} onChange={(e) => setTimeSlot(e.target.value)} 
-                        className="w-full px-4 py-3 text-sm rounded-xl border-2 border-slate-300 bg-slate-50/70 hover:bg-white focus:bg-white text-slate-900 font-semibold focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none transition-all shadow-sm cursor-pointer appearance-none pr-10"
+                    <input
+                      type="date" required value={appointmentDate} onChange={(e) => setAppointmentDate(e.target.value)}
+                      className="w-full px-3 py-2 rounded-md border outline-none text-sm font-medium"
+                      style={{ borderColor: 'var(--border-default)', background: 'var(--surface-secondary)', color: 'var(--text-primary)' }}
+                    />
+                  </div>
+
+                  {!isEmergency && (
+                    <div>
+                      <label className="block text-[11px] font-semibold uppercase mb-1" style={{ color: 'var(--text-tertiary)', letterSpacing: '0.03em' }}>
+                        Time Slot <span style={{ color: 'var(--danger-500)' }}>*</span>
+                      </label>
+                      <select
+                        required value={timeSlot} onChange={(e) => setTimeSlot(e.target.value)}
+                        className="w-full px-3 py-2 rounded-md border outline-none text-sm font-medium cursor-pointer"
+                        style={{ borderColor: 'var(--border-default)', background: 'var(--surface-secondary)', color: 'var(--text-primary)' }}
                       >
-                        <option value="" disabled className="text-slate-400 font-normal">-- Select Time --</option>
+                        <option value="" disabled>-- Select Time Slot --</option>
                         {generateTimeSlots().map(slot => (
-                          <option key={slot} value={slot} className="text-slate-900 font-medium">{slot}</option>
+                          <option key={slot} value={slot}>{slot}</option>
                         ))}
                       </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-500">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                      </div>
                     </div>
+                  )}
+                </div>
+
+                {/* Emergency Triage Toggle */}
+                <div
+                  onClick={() => setIsEmergency(!isEmergency)}
+                  className="cursor-pointer border rounded-md p-3 flex items-start gap-3 transition-colors"
+                  style={{
+                    borderColor: isEmergency ? 'var(--danger-500)' : 'var(--border-default)',
+                    background: isEmergency ? 'var(--danger-50)' : 'var(--surface-secondary)'
+                  }}
+                >
+                  <div className="mt-0.5 w-4 h-4 rounded border flex items-center justify-center flex-shrink-0"
+                    style={{
+                      borderColor: isEmergency ? 'var(--danger-500)' : 'var(--border-strong)',
+                      background: isEmergency ? 'var(--danger-500)' : 'var(--surface-primary)'
+                    }}
+                  >
+                    {isEmergency && <span className="text-white text-[10px] font-bold">✓</span>}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-xs" style={{ color: isEmergency ? 'var(--danger-600)' : 'var(--text-primary)' }}>
+                      Emergency Walk-In Case
+                    </h3>
+                    <p className="text-[11px] mt-0.5 leading-snug" style={{ color: isEmergency ? 'var(--danger-600)' : 'var(--text-tertiary)' }}>
+                      Overrides standard slots, issues priority token (E-XX) and assigns to immediate doctor attention.
+                    </p>
+                  </div>
+                </div>
+
+                {successMessage && (
+                  <div className="p-3 rounded-md text-xs font-medium border flex items-center gap-2" style={{ background: 'var(--positive-50)', borderColor: 'var(--positive-100)', color: 'var(--positive-600)' }}>
+                    <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                    <span>{successMessage}</span>
                   </div>
                 )}
-              </div>
 
-              {/* Emergency Walk-In Toggle */}
-              <div 
-                onClick={() => setIsEmergency(!isEmergency)} 
-                className={`cursor-pointer border-2 rounded-2xl p-3.5 flex items-center transition-all ${
-                  isEmergency 
-                    ? 'border-red-500 bg-red-50/80 shadow-md shadow-red-500/10' 
-                    : 'border-slate-300 bg-slate-50 hover:bg-slate-100'
-                }`}
-              >
-                <div className={`w-5 h-5 rounded-md border flex items-center justify-center mr-3 ${isEmergency ? 'bg-red-500 border-red-500 text-white' : 'bg-white border-slate-400'}`}>
-                  {isEmergency && <span className="font-black text-xs">✓</span>}
-                </div>
-                <div>
-                  <h3 className={`font-black text-xs sm:text-sm ${isEmergency ? 'text-red-700' : 'text-slate-800'}`}>Emergency Walk-In Case</h3>
-                  <p className="text-[10px] text-slate-500 font-medium">Overrides slots, generates priority token (E-XX) & puts at front of queue</p>
-                </div>
-              </div>
-
-              {successMessage && (
-                <div className="bg-emerald-50 text-emerald-700 p-3 rounded-xl font-bold text-center text-xs sm:text-sm shadow-sm border border-emerald-200 animate-fadeIn">
-                  ✅ {successMessage}
-                </div>
-              )}
-
-              <button 
-                type="submit" disabled={isSubmitting} 
-                className={`w-full py-3.5 sm:py-4 rounded-xl font-black text-sm sm:text-base text-white transition-all active:scale-98 shadow-md ${
-                  isSubmitting ? 'bg-slate-400' : (isEmergency ? 'bg-red-600 hover:bg-red-700 shadow-red-600/30' : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-600/30')
-                }`}
-              >
-                {isSubmitting ? 'Generating Token...' : (isEmergency ? '🚨 Issue Emergency Token' : 'Confirm & Issue Token')}
-              </button>
-            </form>
+                <button
+                  type="submit" disabled={isSubmitting}
+                  className="w-full py-2.5 rounded-md font-semibold text-sm text-white transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                  style={{ background: isEmergency ? 'var(--danger-500)' : 'var(--blue-600)' }}
+                  onMouseEnter={e => e.currentTarget.style.background = isEmergency ? 'var(--danger-600)' : 'var(--blue-700)'}
+                  onMouseLeave={e => e.currentTarget.style.background = isEmergency ? 'var(--danger-500)' : 'var(--blue-600)'}
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="w-4 h-4" />
+                  )}
+                  {isSubmitting ? 'Registering...' : (isEmergency ? 'Issue Emergency Token' : 'Confirm & Dispatch Token')}
+                </button>
+              </form>
+            </div>
           </div>
 
-          {/* --- LIVE QUEUE DASHBOARD --- */}
-          <div className="xl:col-span-2 flex flex-col">
-            
-            {/* Queue Search & Emergency Filter Toolbar */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          {/* LIVE QUEUE CONSOLE */}
+          <div className="xl:col-span-2 flex flex-col gap-4">
+
+            {/* Queue Search & Filter Bar */}
+            <div className="p-3 rounded-lg border flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
               <div className="relative flex-1">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
-                <input 
-                  type="text" 
-                  placeholder="Search patient by name or token (e.g. S-14)..." 
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
+                <input
+                  type="text"
+                  placeholder="Filter queue by patient name or token number (e.g. S-12)..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm rounded-xl border-2 border-slate-300 bg-slate-50/70 focus:bg-white text-slate-900 font-medium placeholder:text-slate-400 focus:border-indigo-600 outline-none transition-all shadow-sm"
+                  className="w-full pl-9 pr-8 py-1.5 text-xs rounded-md border outline-none font-medium"
+                  style={{ borderColor: 'var(--border-default)', background: 'var(--surface-secondary)', color: 'var(--text-primary)' }}
                 />
                 {searchQuery && (
-                  <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">✕</button>
+                  <button onClick={() => setSearchQuery('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer" style={{ color: 'var(--text-muted)' }}>
+                    <X className="w-3.5 h-3.5" />
+                  </button>
                 )}
               </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setFilterEmergencyOnly(!filterEmergencyOnly)}
-                  className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                    filterEmergencyOnly 
-                      ? 'bg-red-600 text-white shadow-md shadow-red-600/20' 
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  <span>🚨</span>
-                  <span>Emergencies Only</span>
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setFilterEmergencyOnly(!filterEmergencyOnly)}
+                className="px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 border"
+                style={{
+                  background: filterEmergencyOnly ? 'var(--danger-500)' : 'var(--surface-secondary)',
+                  borderColor: filterEmergencyOnly ? 'var(--danger-500)' : 'var(--border-default)',
+                  color: filterEmergencyOnly ? 'white' : 'var(--text-secondary)'
+                }}
+              >
+                <AlertTriangle className="w-3.5 h-3.5" />
+                <span>Urgent Priority Only</span>
+              </button>
             </div>
 
+            {/* DOCTOR CABIN QUEUES */}
             {doctorsList.length === 0 ? (
-              <div className="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500 text-sm">
-                No doctors registered yet. Please add a doctor in the portal.
+              <div className="p-8 rounded-lg border text-center" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+                <Stethoscope className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--text-muted)' }} />
+                <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>No doctors registered for this facility.</p>
+                <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>Please onboard clinical staff in the portal.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 flex-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {Object.entries(groupedQueues).map(([doctorName, patients]) => (
-                  <div key={doctorName} className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-96">
-                    
+                  <div key={doctorName} className="rounded-lg border flex flex-col h-96 overflow-hidden" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+
                     {/* Cabin Header */}
-                    <div className="bg-slate-900 p-3.5 sm:p-4 text-white flex justify-between items-center rounded-t-2xl border-b border-slate-800">
+                    <div className="p-3 sm:p-3.5 border-b flex justify-between items-center" style={{ background: 'var(--surface-secondary)', borderColor: 'var(--border-subtle)' }}>
                       <div className="flex items-center gap-2">
-                        <span className="text-base">👨‍⚕️</span>
+                        <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: 'var(--blue-50)' }}>
+                          <Stethoscope className="w-4 h-4" style={{ color: 'var(--blue-600)' }} />
+                        </div>
                         <div>
-                          <h3 className="font-bold text-sm sm:text-base leading-tight truncate max-w-[170px] sm:max-w-none">{doctorName}</h3>
-                          <span className="text-[10px] text-slate-400 font-mono">Cabin Waiting List</span>
+                          <h3 className="font-semibold text-xs sm:text-sm truncate max-w-[180px]" style={{ color: 'var(--text-primary)' }}>
+                            {doctorName}
+                          </h3>
+                          <span className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>OPD Cabin Queue</span>
                         </div>
                       </div>
-                      <span className={`${patients.length > 0 ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400 border border-slate-700'} text-[10px] sm:text-xs font-black px-2.5 py-0.5 rounded-full`}>
-                        {patients.length} Waiting
+                      <span className={`badge ${patients.length > 0 ? 'badge--blue' : 'badge--neutral'} text-[10px]`}>
+                        {patients.length} in queue
                       </span>
                     </div>
 
-                    {/* Patient Cards List */}
-                    <div className="flex-1 overflow-y-auto p-2.5 bg-slate-50 space-y-2">
+                    {/* Patient Queue List */}
+                    <div className="flex-1 overflow-y-auto p-2.5 space-y-2" style={{ background: 'var(--surface-app)' }}>
                       {patients.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-center p-4 text-slate-400">
-                          <span className="text-2xl mb-1 opacity-50">☕</span>
-                          <p className="text-xs font-medium italic">No patients in queue</p>
+                        <div className="h-full flex flex-col items-center justify-center text-center p-4">
+                          <Users className="w-6 h-6 mb-1 opacity-30" style={{ color: 'var(--text-muted)' }} />
+                          <p className="text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>No patients waiting</p>
                         </div>
                       ) : (
-                        patients.sort((a, b) => (a.isEmergency === b.isEmergency ? (a.timeSlot > b.timeSlot ? 1 : -1) : a.isEmergency ? -1 : 1)).map((patient) => {
-                          const initials = patient.patientName?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'PT';
-                          return (
-                            <div 
-                              key={patient.id} 
-                              className={`p-3 rounded-xl border flex justify-between items-center transition-all hover:shadow-sm ${
-                                patient.isEmergency ? 'bg-red-50/90 border-red-200' : 'bg-white border-slate-200 shadow-sm'
-                              }`}
-                            >
-                              <div className="flex items-center space-x-3 truncate">
-                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs flex-shrink-0 ${
-                                  patient.isEmergency ? 'bg-red-200 text-red-800' : 'bg-indigo-100 text-indigo-700'
-                                }`}>
-                                  {initials}
-                                </div>
-                                
-                                <div className="truncate">
-                                  <div className="flex items-center gap-1.5">
-                                    <p className="font-black text-slate-800 text-xs sm:text-sm truncate">
-                                      {patient.patientName}
-                                    </p>
-                                    {patient.isEmergency && (
-                                      <span className="text-[9px] bg-red-600 text-white px-1.5 py-0.2 rounded font-black uppercase tracking-wider animate-pulse">
-                                        URGENT
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="flex items-center gap-2 mt-0.5">
-                                    <span className="text-[10px] font-mono font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-100">
-                                      {patient.tokenNumber}
-                                    </span>
-                                    <span className="text-[10px] text-slate-500 font-medium">{patient.timeSlot}</span>
-                                    {patient.scannedPrescriptionText && (
-                                      <span className="text-[9px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-1 py-0.2 rounded">
-                                        📷 OCR Rx
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              <button 
-                                onClick={() => handleCancelAppointment(patient.id)}
-                                className="text-slate-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors flex-shrink-0 ml-2"
-                                title="Cancel Appointment"
+                        patients
+                          .sort((a, b) => (a.isEmergency === b.isEmergency ? (a.timeSlot > b.timeSlot ? 1 : -1) : a.isEmergency ? -1 : 1))
+                          .map((patient) => {
+                            const initials = patient.patientName?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'PT';
+                            return (
+                              <div
+                                key={patient.id}
+                                className="p-2.5 rounded-md border flex justify-between items-center transition-colors"
+                                style={{
+                                  background: patient.isEmergency ? 'var(--danger-50)' : 'var(--surface-primary)',
+                                  borderColor: patient.isEmergency ? 'var(--danger-100)' : 'var(--border-subtle)'
+                                }}
                               >
-                                ✕
-                              </button>
-                            </div>
-                          );
-                        })
+                                <div className="flex items-center gap-2.5 truncate">
+                                  <div 
+                                    className="w-8 h-8 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0"
+                                    style={{
+                                      background: patient.isEmergency ? 'var(--danger-500)' : 'var(--blue-50)',
+                                      color: patient.isEmergency ? 'white' : 'var(--blue-600)'
+                                    }}
+                                  >
+                                    {initials}
+                                  </div>
+
+                                  <div className="truncate">
+                                    <div className="flex items-center gap-1.5">
+                                      <p className="font-semibold text-xs truncate" style={{ color: 'var(--text-primary)' }}>
+                                        {patient.patientName}
+                                      </p>
+                                      {patient.isEmergency && (
+                                        <span className="badge badge--danger text-[9px]">
+                                          URGENT
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                      <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded" style={{ background: 'var(--surface-secondary)', border: '1px solid var(--border-default)', color: 'var(--blue-600)' }}>
+                                        {patient.tokenNumber}
+                                      </span>
+                                      <span className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>
+                                        {patient.timeSlot}
+                                      </span>
+                                      {patient.scannedPrescriptionText && (
+                                        <span className="badge badge--neutral text-[9px] flex items-center gap-0.5">
+                                          <FileText className="w-2.5 h-2.5" />
+                                          OCR
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <button
+                                  onClick={() => handleCancelAppointment(patient.id, patient.patientName)}
+                                  className="p-1 rounded text-[11px] transition-colors cursor-pointer flex-shrink-0"
+                                  style={{ color: 'var(--text-muted)' }}
+                                  onMouseEnter={e => { e.currentTarget.style.color = 'var(--danger-500)'; }}
+                                  onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; }}
+                                  title="Cancel Appointment"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
+                            );
+                          })
                       )}
                     </div>
+
                   </div>
                 ))}
               </div>
             )}
+
           </div>
 
         </div>
+
       </div>
     </div>
   );

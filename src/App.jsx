@@ -13,7 +13,10 @@ import {
   LogOut, 
   ArrowLeft, 
   Menu, 
-  X 
+  X,
+  ChevronRight,
+  Building2,
+  Loader2
 } from 'lucide-react';
 
 import LandingPage from './LandingPage';
@@ -70,41 +73,45 @@ export default function App() {
     setCurrentView('receptionist'); 
   };
 
+  // --- Loading State ---
   if (isAuthenticating) {
     return (
-      <div className="min-h-screen bg-[#030712] flex items-center justify-center text-white p-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-studio-grid opacity-25"></div>
-        <div className="text-center relative z-10 flex flex-col items-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 via-blue-600 to-cyan-400 flex items-center justify-center font-black text-white text-2xl shadow-[0_0_50px_rgba(99,102,241,0.5)] border border-white/20 animate-pulse mb-6">
-            ✚
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--surface-app)' }}>
+        <div className="text-center flex flex-col items-center gap-3">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'var(--blue-600)' }}>
+            <span className="text-white font-bold text-sm">A</span>
           </div>
-          <h2 className="text-xs font-mono font-bold tracking-[0.25em] text-slate-400 uppercase">
-            INITIALIZING CLINICAL KERNEL...
-          </h2>
+          <div className="flex items-center gap-2" style={{ color: 'var(--text-tertiary)' }}>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span className="text-sm font-medium">Loading workspace...</span>
+          </div>
         </div>
       </div>
     );
   }
 
+  // --- Auth Screens ---
   if (!user) {
     if (showAuthScreen) {
       return (
-        <div className="min-h-screen bg-[#030712] flex flex-col relative overflow-hidden">
-          <div className="absolute inset-0 bg-studio-grid opacity-20 pointer-events-none"></div>
-          <div className="p-4 sm:p-5 flex items-center justify-between border-b border-white/10 bg-black/60 sticky top-0 z-50 backdrop-blur-2xl">
+        <div className="min-h-screen flex flex-col" style={{ background: 'var(--surface-app)' }}>
+          <div className="px-4 sm:px-6 py-3 flex items-center justify-between border-b" style={{ borderColor: 'var(--border-default)', background: 'var(--surface-primary)' }}>
             <button 
               onClick={() => setShowAuthScreen(false)} 
-              className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all border border-white/10 active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer"
+              style={{ color: 'var(--text-secondary)' }}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-tertiary)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Back to Overview</span>
+              <span>Back</span>
             </button>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[11px] font-mono text-slate-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-              <span>SECURE ACCESS PORTAL</span>
+            <div className="inline-flex items-center gap-2 text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>
+              <span className="status-dot status-dot--active"></span>
+              <span>Secure Portal</span>
             </div>
           </div>
-          <div className="flex-1 flex items-center justify-center p-3 sm:p-4 z-10">
+          <div className="flex-1 flex items-center justify-center p-4">
             <Auth />
           </div>
         </div>
@@ -116,90 +123,82 @@ export default function App() {
 
   if (!userProfile) return null; 
 
+  // --- Navigation Configuration ---
   const navigationTabs = [
     {
       id: 'receptionist',
-      label: 'Receptionist',
+      label: 'Reception',
       icon: ClipboardList,
       allowedRoles: ['Receptionist', 'Hospital Admin', 'Super Admin'],
-      activeClass: 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.2)]'
     },
     {
       id: 'doctor',
-      label: 'Doctor Workspace',
+      label: 'Doctor',
       icon: Stethoscope,
       allowedRoles: ['Doctor', 'Super Admin'],
-      activeClass: 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.2)]'
     },
     {
       id: 'smartPad',
       label: 'Smart Pad',
       icon: PenTool,
       allowedRoles: ['Doctor', 'Super Admin'],
-      activeClass: 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.2)]'
     },
     {
       id: 'pharmacy',
-      label: 'E-Pharmacy',
+      label: 'Pharmacy',
       icon: Pill,
       allowedRoles: ['Pharmacist', 'Hospital Admin', 'Super Admin'],
-      activeClass: 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.2)]'
     },
     {
       id: 'hospitalAdmin',
-      label: 'Analytics Hub',
+      label: 'Analytics',
       icon: BarChart3,
       allowedRoles: ['Hospital Admin', 'Super Admin'],
-      activeClass: 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.2)]'
     },
     {
       id: 'tv',
-      label: 'TV Signage',
+      label: 'TV Display',
       icon: Tv,
       allowedRoles: ['Receptionist', 'Doctor', 'Pharmacist', 'Hospital Admin'],
-      activeClass: 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.2)]'
     },
     {
       id: 'admin',
-      label: 'Founder Console',
+      label: 'Console',
       icon: ShieldAlert,
       allowedRoles: ['Super Admin'],
-      activeClass: 'bg-rose-500 text-white shadow-[0_0_20px_rgba(244,63,94,0.4)]'
     }
   ];
 
   const visibleTabs = navigationTabs.filter(tab => tab.allowedRoles.includes(userProfile.role));
 
   return (
-    <div className="min-h-screen bg-[#070B14] text-slate-200 font-sans flex flex-col selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen flex flex-col font-sans" style={{ background: 'var(--surface-app)', color: 'var(--text-primary)' }}>
       
-      {/* --- TOP NAVIGATION BAR (Apple Pro Studio Grade) --- */}
-      <nav className="bg-black/70 border-b border-white/[0.08] px-4 sm:px-6 py-3 sticky top-0 z-50 print:hidden backdrop-blur-2xl">
-        <div className="flex items-center justify-between">
+      {/* --- TOP NAVIGATION BAR --- */}
+      <nav className="sticky top-0 z-50 print:hidden border-b" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+        <div className="px-4 sm:px-6 py-2.5 flex items-center justify-between">
           
-          <div className="flex items-center space-x-3 sm:space-x-5">
-            {/* Brand Logo & Hospital ID */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-500 via-blue-600 to-cyan-400 flex items-center justify-center font-black text-white text-sm shadow-[0_0_20px_rgba(99,102,241,0.4)] border border-white/20 select-none">
-                  ✚
-                </div>
-                <div className="text-lg font-black tracking-tight text-white whitespace-nowrap">
-                  Arogya<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">Next</span>
-                </div>
+          <div className="flex items-center gap-4 sm:gap-6">
+            {/* Brand */}
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: 'var(--blue-600)' }}>
+                <span className="text-white font-bold text-xs">A</span>
               </div>
-
-              {userProfile.hospitalId && (
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[11px] font-mono text-slate-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse"></span>
-                  <span className="hidden sm:inline text-slate-500 text-[10px] uppercase font-mono">HOSP:</span>
-                  <span className="text-indigo-300 font-bold tracking-wider">{userProfile.hospitalId}</span>
-                </div>
-              )}
+              <span className="text-base font-bold" style={{ color: 'var(--text-primary)' }}>
+                ArogyaNext
+              </span>
             </div>
 
-            {/* Desktop Navigation Tabs (Apple Pill Design) */}
-            <div className="hidden md:flex space-x-1 ml-3 bg-white/[0.03] p-1 rounded-full border border-white/[0.06]">
+            {/* Hospital ID */}
+            {userProfile.hospitalId && (
+              <div className="hidden sm:flex items-center gap-1.5 text-xs font-medium" style={{ color: 'var(--text-tertiary)' }}>
+                <Building2 className="w-3.5 h-3.5" />
+                <span className="font-mono" style={{ color: 'var(--text-secondary)' }}>{userProfile.hospitalId}</span>
+              </div>
+            )}
+
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center gap-0.5">
               {visibleTabs.map(tab => {
                 const Icon = tab.icon;
                 const isActive = currentView === tab.id;
@@ -207,9 +206,13 @@ export default function App() {
                   <button 
                     key={tab.id}
                     onClick={() => setCurrentView(tab.id)} 
-                    className={`px-3.5 py-1.5 rounded-full font-semibold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
-                      isActive ? tab.activeClass : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
-                    }`}
+                    className="px-3 py-1.5 rounded-md font-medium text-[13px] transition-colors flex items-center gap-1.5 cursor-pointer"
+                    style={{
+                      background: isActive ? 'var(--blue-50)' : 'transparent',
+                      color: isActive ? 'var(--blue-600)' : 'var(--text-tertiary)',
+                    }}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'var(--surface-tertiary)'; }}
+                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
                   >
                     <Icon className="w-3.5 h-3.5" />
                     <span>{tab.label}</span>
@@ -219,89 +222,89 @@ export default function App() {
             </div>
           </div>
 
-          {/* User profile & Logout */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            <div className="hidden sm:flex items-center gap-2.5 mr-2 pl-3 border-l border-white/10">
-              <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-xs font-bold text-indigo-300">
+          {/* User & Actions */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* User info (desktop) */}
+            <div className="hidden sm:flex items-center gap-2 mr-1 pl-3 border-l" style={{ borderColor: 'var(--border-default)' }}>
+              <div className="w-7 h-7 rounded-md flex items-center justify-center text-xs font-semibold" style={{ background: 'var(--blue-50)', color: 'var(--blue-600)' }}>
                 {(userProfile.fullName || user.email || 'U')[0].toUpperCase()}
               </div>
               <div className="flex flex-col text-left">
-                <span className="text-xs font-bold text-white leading-tight truncate max-w-[140px]">
+                <span className="text-[13px] font-semibold truncate max-w-[130px]" style={{ color: 'var(--text-primary)' }}>
                   {userProfile.fullName || user.email}
                 </span>
-                <span className="text-[10px] font-mono text-indigo-400 uppercase tracking-widest font-bold">
+                <span className="text-[11px] font-medium" style={{ color: 'var(--text-tertiary)' }}>
                   {userProfile.role}
                 </span>
               </div>
             </div>
 
+            {/* Log out */}
             <button 
               onClick={handleLogout} 
-              className="px-3.5 py-1.5 sm:px-4 sm:py-2 bg-white/5 hover:bg-rose-500/10 hover:text-rose-300 text-slate-300 rounded-full text-xs sm:text-sm font-bold transition-all border border-white/10 hover:border-rose-500/30 active:scale-95 flex items-center gap-1.5 cursor-pointer"
+              className="px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
+              style={{ color: 'var(--text-secondary)', borderColor: 'var(--border-default)' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--danger-50)'; e.currentTarget.style.color = 'var(--danger-600)'; e.currentTarget.style.borderColor = 'var(--danger-100)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.borderColor = 'var(--border-default)'; }}
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>Log Out</span>
+              <span className="hidden sm:inline">Sign Out</span>
             </button>
 
-            {/* Mobile Menu Toggle for Navigation */}
+            {/* Mobile menu toggle */}
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-white cursor-pointer"
+              className="lg:hidden p-2 rounded-md cursor-pointer transition-colors"
+              style={{ color: 'var(--text-secondary)' }}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-tertiary)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               aria-label="Toggle mobile menu"
             >
               {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
           </div>
-
         </div>
 
-        {/* Mobile Dropdown Menu */}
+        {/* Mobile Navigation Dropdown */}
         {mobileMenuOpen && (
-          <div className="md:hidden mt-3 pt-3 border-t border-white/10 grid grid-cols-2 gap-2 animate-fadeIn">
-            {visibleTabs.map(tab => {
-              const Icon = tab.icon;
-              const isActive = currentView === tab.id;
-              return (
-                <button 
-                  key={tab.id}
-                  onClick={() => { setCurrentView(tab.id); setMobileMenuOpen(false); }} 
-                  className={`p-2.5 rounded-xl font-semibold text-xs transition-all flex items-center gap-2 text-left cursor-pointer ${
-                    isActive ? tab.activeClass : 'bg-white/[0.03] text-slate-400 border border-white/[0.06]'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="truncate">{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Mobile Horizontal Pill Bar (Always accessible on phones) */}
-        {!mobileMenuOpen && (
-          <div className="md:hidden mt-2.5 pt-2 border-t border-white/[0.06] flex space-x-1.5 overflow-x-auto pb-1 no-scrollbar">
-            {visibleTabs.map(tab => {
-              const Icon = tab.icon;
-              const isActive = currentView === tab.id;
-              return (
-                <button 
-                  key={tab.id}
-                  onClick={() => setCurrentView(tab.id)} 
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-                    isActive ? tab.activeClass : 'bg-white/[0.03] text-slate-400 border border-white/[0.06]'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
+          <div className="lg:hidden border-t px-4 py-3 animate-fadeIn" style={{ borderColor: 'var(--border-subtle)', background: 'var(--surface-primary)' }}>
+            <div className="grid grid-cols-2 gap-1.5">
+              {visibleTabs.map(tab => {
+                const Icon = tab.icon;
+                const isActive = currentView === tab.id;
+                return (
+                  <button 
+                    key={tab.id}
+                    onClick={() => { setCurrentView(tab.id); setMobileMenuOpen(false); }} 
+                    className="p-2.5 rounded-md font-medium text-[13px] transition-colors flex items-center gap-2 text-left cursor-pointer"
+                    style={{
+                      background: isActive ? 'var(--blue-50)' : 'var(--surface-secondary)',
+                      color: isActive ? 'var(--blue-600)' : 'var(--text-secondary)',
+                      border: isActive ? '1px solid var(--blue-100)' : '1px solid var(--border-subtle)',
+                    }}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {/* Mobile user info */}
+            <div className="sm:hidden mt-3 pt-3 border-t flex items-center gap-2" style={{ borderColor: 'var(--border-subtle)' }}>
+              <div className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-semibold" style={{ background: 'var(--blue-50)', color: 'var(--blue-600)' }}>
+                {(userProfile.fullName || user.email || 'U')[0].toUpperCase()}
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{userProfile.fullName || user.email}</span>
+                <span className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>{userProfile.role} · {userProfile.hospitalId}</span>
+              </div>
+            </div>
           </div>
         )}
       </nav>
 
       {/* --- MAIN CONTENT AREA --- */}
-      <main className="flex-1 relative bg-[#070B14] overflow-y-auto print:overflow-visible">
+      <main className="flex-1 overflow-y-auto print:overflow-visible">
         {currentView === 'receptionist' && <ReceptionistPanel hospitalId={userProfile.hospitalId} />}
         {currentView === 'doctor' && <DoctorPanel hospitalId={userProfile.hospitalId} doctorName={userProfile.fullName} />}
         {currentView === 'smartPad' && <SmartPrescriptionPanel hospitalId={userProfile.hospitalId} doctorName={userProfile.fullName} />}
@@ -310,7 +313,6 @@ export default function App() {
         {currentView === 'admin' && <AdminPanel />}
         {currentView === 'tv' && <TVDisplay hospitalId={userProfile.hospitalId} />}
       </main>
-
     </div>
   );
 }
