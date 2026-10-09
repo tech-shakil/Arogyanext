@@ -1,0 +1,72 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: Safely retrieve current user profile data
+    function getUserData() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data
+        : {};
+    }
+    
+    // Helper: Check if authenticated user is Super Admin
+    function isSuperAdmin() {
+      return request.auth != null && getUserData().role == 'Super Admin';
+    }
+
+    // --- USERS ---
+    match /users/{userId} {
+      // Users can register their account during signup
+      allow create: if request.auth != null && request.auth.uid == userId;
+      // Users can read/update their own profile; Super Admin has full management access
+      allow read, update, delete: if request.auth != null && (request.auth.uid == userId || isSuperAdmin());
+    }
+
+    // --- HOSPITALS ---
+    match /hospitals/{docId} {
+      // Public read required during registration for hospital ID verification and name lookups
+      allow read: if true; 
+      // Only Super Admin can register or modify hospital tenants
+      allow write: if isSuperAdmin();
+    }
+
+    // --- DOCTORS ---
+    match /doctors/{docId} {
+      // Clinical staff can read doctor directory for OPD assignments
+      allow read: if request.auth != null; 
+      // Doctors can register their own profile; Super Admin can manage
+      allow create: if request.auth != null && (request.auth.uid == docId || isSuperAdmin());
+      allow update, delete: if request.auth != null && (request.auth.uid == docId || isSuperAdmin());
+    }
+
+    // --- DOCTOR STATUS (Live status, active consultation, current token) ---
+    match /doctor_status/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // --- QUEUE (TV Waiting Room Display & Chime Announcements) ---
+    match /queue/{docHospitalId} {
+      // Public read allows waiting room TV displays to render active tokens without login
+      allow read: if true;
+      // Clinical staff can announce and advance queue tokens
+      allow write: if request.auth != null;
+    }
+
+    // --- APPOINTMENTS (OPD queue, consultations, pharmacy fulfillment) ---
+    match /appointments/{docId} {
+      // Read & manage: Hospital staff of the same facility, the patient themselves, or Super Admin
+      allow read, update, delete: if request.auth != null && (
+        isSuperAdmin() ||
+        resource.data.hospitalId == getUserData().hospitalId || 
+        resource.data.userId == request.auth.uid
+      );
+      
+      // Create: Hospital staff (Receptionists/Doctors) for walk-ins, patients for self-booking, or Super Admin
+      allow create: if request.auth != null && (
+        isSuperAdmin() ||
+        request.resource.data.hospitalId == getUserData().hospitalId ||
+        request.resource.data.userId == request.auth.uid
+      );
+    }
+  }
+}

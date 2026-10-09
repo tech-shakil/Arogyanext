@@ -27,10 +27,16 @@ export default function PharmacyPanel({ hospitalId }) {
 
   // Resilient real-time listener for pharmacy orders
   useEffect(() => {
-    const appointmentsRef = collection(db, 'appointments');
+    if (!hospitalId) return;
 
-    // Query collection directly to prevent case-sensitivity or missing-field exclusions in Firestore
-    const q = query(appointmentsRef);
+    const appointmentsRef = collection(db, 'appointments');
+    const isMaster = hospitalId === 'SYSTEM_MASTER';
+
+    // Must query with hospitalId so Firestore security rules allow the read:
+    // resource.data.hospitalId == getUserData().hospitalId
+    const q = (isMaster && showAllFacilities) || isMaster
+      ? query(appointmentsRef)
+      : query(appointmentsRef, where('hospitalId', '==', hospitalId));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setFirestoreError(null);
@@ -38,7 +44,6 @@ export default function PharmacyPanel({ hospitalId }) {
       setTotalAppointmentsInDb(allAppts.length);
 
       const myHosp = (hospitalId || '').trim().toLowerCase();
-      const isMaster = !myHosp || myHosp === 'system_master';
 
       // Check if order belongs to current facility
       const matchesFacility = (order) => {
@@ -78,8 +83,8 @@ export default function PharmacyPanel({ hospitalId }) {
       pending.sort((a, b) => {
         if (a.isEmergency && !b.isEmergency) return -1;
         if (!a.isEmergency && b.isEmergency) return 1;
-        const timeA = a.sentToPharmacyAt || a.completedAt || a.timestamp || 0;
-        const timeB = b.sentToPharmacyAt || b.completedAt || b.timestamp || 0;
+        const timeA = new Date(a.sentToPharmacyAt || a.completedAt || a.timestamp || 0).getTime() || 0;
+        const timeB = new Date(b.sentToPharmacyAt || b.completedAt || b.timestamp || 0).getTime() || 0;
         return timeA < timeB ? -1 : 1;
       });
 
@@ -140,19 +145,32 @@ export default function PharmacyPanel({ hospitalId }) {
           </div>
           
           <div className="flex items-center gap-2 w-full md:w-auto">
-            <button
-              type="button"
-              onClick={() => setShowAllFacilities(!showAllFacilities)}
-              className="px-2.5 py-1 rounded-md text-xs font-semibold border transition-colors cursor-pointer"
-              style={{
-                background: showAllFacilities ? 'var(--blue-50)' : 'var(--surface-secondary)',
-                color: showAllFacilities ? 'var(--blue-600)' : 'var(--text-secondary)',
-                borderColor: showAllFacilities ? 'var(--blue-200)' : 'var(--border-default)'
-              }}
-              title="Click to toggle between current hospital and all facilities"
-            >
-              {showAllFacilities ? 'All Facilities' : (hospitalId ? `Facility: ${hospitalId}` : 'All Facilities')}
-            </button>
+            {hospitalId === 'SYSTEM_MASTER' ? (
+              <button
+                type="button"
+                onClick={() => setShowAllFacilities(!showAllFacilities)}
+                className="px-2.5 py-1 rounded-md text-xs font-semibold border transition-colors cursor-pointer"
+                style={{
+                  background: showAllFacilities ? 'var(--blue-50)' : 'var(--surface-secondary)',
+                  color: showAllFacilities ? 'var(--blue-600)' : 'var(--text-secondary)',
+                  borderColor: showAllFacilities ? 'var(--blue-200)' : 'var(--border-default)'
+                }}
+                title="Super Admin: Toggle between all facilities and current facility"
+              >
+                {showAllFacilities ? 'All Facilities' : 'Master View'}
+              </button>
+            ) : (
+              <div 
+                className="px-2.5 py-1 rounded-md text-xs font-semibold border font-mono"
+                style={{
+                  background: 'var(--surface-secondary)',
+                  color: 'var(--text-secondary)',
+                  borderColor: 'var(--border-default)'
+                }}
+              >
+                Facility: {hospitalId || 'Current'}
+              </div>
+            )}
             <div className="px-3 py-1.5 rounded-md text-center border" style={{ background: 'var(--blue-50)', borderColor: 'var(--blue-100)' }}>
               <span className="font-bold text-base block leading-none" style={{ color: 'var(--blue-600)' }}>{pendingOrders.length}</span>
               <span className="text-[10px] font-semibold uppercase" style={{ color: 'var(--blue-500)', letterSpacing: '0.03em' }}>Pending</span>
@@ -267,7 +285,7 @@ export default function PharmacyPanel({ hospitalId }) {
                 ? `No pending prescriptions across all facilities (${totalAppointmentsInDb} total records in database).`
                 : `No pending prescriptions for facility "${hospitalId || 'Unassigned'}".`}
             </p>
-            {!showAllFacilities && (
+            {!showAllFacilities && hospitalId === 'SYSTEM_MASTER' && (
               <div className="mt-4">
                 <button
                   type="button"
@@ -305,7 +323,7 @@ export default function PharmacyPanel({ hospitalId }) {
                     </span>
                   </div>
                   <span className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>
-                    {order.timeSlot || 'OPD'}
+                    {order.patientAge ? `${order.patientAge} yrs` : 'OPD'}
                   </span>
                 </div>
 
@@ -315,7 +333,7 @@ export default function PharmacyPanel({ hospitalId }) {
                       {order.tokenNumber}
                     </span>
                     <span className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>
-                      {order.timeSlot || 'OPD'}
+                      {order.timeSlot || 'Walk-in'}
                     </span>
                   </div>
 
