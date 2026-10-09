@@ -129,13 +129,13 @@ export default function App() {
       id: 'receptionist',
       label: 'Reception',
       icon: ClipboardList,
-      allowedRoles: ['Receptionist', 'Hospital Admin', 'Super Admin'],
+      allowedRoles: ['Receptionist', 'Doctor', 'Pharmacist', 'Hospital Admin', 'Super Admin'],
     },
     {
       id: 'doctor',
       label: 'Doctor',
       icon: Stethoscope,
-      allowedRoles: ['Doctor', 'Super Admin'],
+      allowedRoles: ['Doctor', 'Hospital Admin', 'Super Admin'],
     },
     {
       id: 'smartPad',
@@ -147,7 +147,7 @@ export default function App() {
       id: 'pharmacy',
       label: 'Pharmacy',
       icon: Pill,
-      allowedRoles: ['Pharmacist', 'Hospital Admin', 'Super Admin'],
+      allowedRoles: ['Doctor', 'Pharmacist', 'Hospital Admin', 'Super Admin'],
     },
     {
       id: 'hospitalAdmin',
@@ -159,7 +159,7 @@ export default function App() {
       id: 'tv',
       label: 'TV Display',
       icon: Tv,
-      allowedRoles: ['Receptionist', 'Doctor', 'Pharmacist', 'Hospital Admin'],
+      allowedRoles: ['Receptionist', 'Doctor', 'Pharmacist', 'Hospital Admin', 'Super Admin'],
     },
     {
       id: 'admin',

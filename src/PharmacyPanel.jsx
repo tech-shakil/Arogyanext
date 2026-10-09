@@ -21,33 +21,58 @@ export default function PharmacyPanel({ hospitalId }) {
   const [filterUrgentOnly, setFilterUrgentOnly] = useState(false);
   const [lastDispensedPatient, setLastDispensedPatient] = useState(null);
 
+  const [firestoreError, setFirestoreError] = useState(null);
+  const [showAllFacilities, setShowAllFacilities] = useState(false);
+  const [totalAppointmentsInDb, setTotalAppointmentsInDb] = useState(0);
+
   // Resilient real-time listener for pharmacy orders
   useEffect(() => {
     const appointmentsRef = collection(db, 'appointments');
-    const isMaster = !hospitalId || hospitalId === 'SYSTEM_MASTER';
 
-    // If hospitalId is provided and specific, filter by hospitalId; otherwise listen across facilities
-    const q = isMaster
-      ? query(appointmentsRef)
-      : query(appointmentsRef, where('hospitalId', '==', hospitalId));
+    // Query collection directly to prevent case-sensitivity or missing-field exclusions in Firestore
+    const q = query(appointmentsRef);
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
+      setFirestoreError(null);
       const allAppts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setTotalAppointmentsInDb(allAppts.length);
 
-      // Filter pending orders (resilient to casing and completed consultation flow)
-      const pending = allAppts.filter(order => {
-        const pStatus = (order.pharmacyStatus || '').toLowerCase();
+      const myHosp = (hospitalId || '').trim().toLowerCase();
+      const isMaster = !myHosp || myHosp === 'system_master';
+
+      // Check if order belongs to current facility
+      const matchesFacility = (order) => {
+        if (showAllFacilities || isMaster) return true;
+        const oHosp = (order.hospitalId || '').trim().toLowerCase();
+        if (!oHosp) return true; // Include unassigned orders
+        return oHosp === myHosp;
+      };
+
+      // Comprehensive pending check
+      const isPending = (order) => {
+        const pStatus = (order.pharmacyStatus || '').trim().toLowerCase();
         
+        // If explicitly dispensed or skipped, it's not pending
+        if (pStatus === 'dispensed' || pStatus === 'skipped') return false;
+
         // Explicitly marked as pending
         if (pStatus === 'pending') return true;
-        
-        // Completed consultations with prescription that haven't been dispensed yet and were not skipped
-        if (order.status === 'Completed' && pStatus !== 'dispensed' && pStatus !== 'skipped') {
-          return Boolean(order.prescription || order.scannedPrescriptionText || order.ocrText);
+
+        // Completed consultations with prescription that haven't been dispensed yet
+        if (order.status === 'Completed' && (order.prescription || order.scannedPrescriptionText || order.ocrText)) {
+          return true;
         }
-        
+
+        // Any order that has prescription text and is not marked dispensed
+        if (order.prescription && order.prescription.trim() !== '') {
+          return true;
+        }
+
         return false;
-      });
+      };
+
+      // Filter pending orders
+      const pending = allAppts.filter(order => matchesFacility(order) && isPending(order));
 
       // Sort pending orders: Emergencies first, then chronological
       pending.sort((a, b) => {
@@ -60,7 +85,8 @@ export default function PharmacyPanel({ hospitalId }) {
 
       // Count dispensed orders
       const dispensed = allAppts.filter(order => {
-        const pStatus = (order.pharmacyStatus || '').toLowerCase();
+        if (!matchesFacility(order)) return false;
+        const pStatus = (order.pharmacyStatus || '').trim().toLowerCase();
         return pStatus === 'dispensed';
       });
 
@@ -68,10 +94,11 @@ export default function PharmacyPanel({ hospitalId }) {
       setDispensedCount(dispensed.length);
     }, (error) => {
       console.error("Pharmacy orders listener error:", error);
+      setFirestoreError(error.message || "Failed to load orders from Firestore");
     });
 
     return () => unsubscribe();
-  }, [hospitalId]);
+  }, [hospitalId, showAllFacilities]);
 
   // Mark the medicine as packed and handed to the patient
   const handleDispense = async (order) => {
@@ -112,16 +139,34 @@ export default function PharmacyPanel({ hospitalId }) {
             <p className="text-sm mt-0.5" style={{ color: 'var(--text-tertiary)' }}>Prescription fulfillment & medication dispensing</p>
           </div>
           
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            <span className="px-2.5 py-1 rounded-md text-xs font-mono font-semibold border" style={{ background: 'var(--surface-secondary)', borderColor: 'var(--border-default)', color: 'var(--text-secondary)' }}>
-              {hospitalId}
-            </span>
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <button
+              type="button"
+              onClick={() => setShowAllFacilities(!showAllFacilities)}
+              className="px-2.5 py-1 rounded-md text-xs font-semibold border transition-colors cursor-pointer"
+              style={{
+                background: showAllFacilities ? 'var(--blue-50)' : 'var(--surface-secondary)',
+                color: showAllFacilities ? 'var(--blue-600)' : 'var(--text-secondary)',
+                borderColor: showAllFacilities ? 'var(--blue-200)' : 'var(--border-default)'
+              }}
+              title="Click to toggle between current hospital and all facilities"
+            >
+              {showAllFacilities ? 'All Facilities' : (hospitalId ? `Facility: ${hospitalId}` : 'All Facilities')}
+            </button>
             <div className="px-3 py-1.5 rounded-md text-center border" style={{ background: 'var(--blue-50)', borderColor: 'var(--blue-100)' }}>
               <span className="font-bold text-base block leading-none" style={{ color: 'var(--blue-600)' }}>{pendingOrders.length}</span>
               <span className="text-[10px] font-semibold uppercase" style={{ color: 'var(--blue-500)', letterSpacing: '0.03em' }}>Pending</span>
             </div>
           </div>
         </div>
+
+        {/* Firestore Error Alert (if any) */}
+        {firestoreError && (
+          <div className="mb-4 p-3 rounded-md border text-xs font-medium flex items-center gap-2" style={{ background: 'var(--danger-50)', borderColor: 'var(--danger-100)', color: 'var(--danger-600)' }}>
+            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+            <span>Database Error: {firestoreError}</span>
+          </div>
+        )}
 
         {/* --- METRICS --- */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5 sm:mb-6">
@@ -214,10 +259,26 @@ export default function PharmacyPanel({ hospitalId }) {
 
         {/* --- ORDERS --- */}
         {filteredOrders.length === 0 ? (
-          <div className="rounded-lg border p-12 sm:p-16 text-center" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
+          <div className="rounded-lg border p-10 sm:p-14 text-center" style={{ background: 'var(--surface-primary)', borderColor: 'var(--border-default)' }}>
             <Package className="w-10 h-10 mx-auto mb-3" style={{ color: 'var(--text-muted)' }} />
-            <h2 className="text-base font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>No pending orders</h2>
-            <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>New prescriptions from doctor consultations will appear here automatically.</p>
+            <h2 className="text-base font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>No pending orders found</h2>
+            <p className="text-sm max-w-md mx-auto" style={{ color: 'var(--text-tertiary)' }}>
+              {showAllFacilities 
+                ? `No pending prescriptions across all facilities (${totalAppointmentsInDb} total records in database).`
+                : `No pending prescriptions for facility "${hospitalId || 'Unassigned'}".`}
+            </p>
+            {!showAllFacilities && (
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowAllFacilities(true)}
+                  className="px-3.5 py-2 rounded-md text-xs font-semibold border transition-colors cursor-pointer"
+                  style={{ background: 'var(--blue-50)', color: 'var(--blue-600)', borderColor: 'var(--blue-200)' }}
+                >
+                  Check Across All Facilities ({totalAppointmentsInDb} in system)
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -230,15 +291,23 @@ export default function PharmacyPanel({ hospitalId }) {
                   borderColor: order.isEmergency ? 'var(--danger-100)' : 'var(--border-default)' 
                 }}
               >
-                {/* Urgent badge */}
-                {order.isEmergency && (
-                  <div className="mb-2">
-                    <span className="badge badge--danger text-[10px] font-bold">
-                      <AlertTriangle className="w-3 h-3" />
-                      Urgent
+                {/* Header row */}
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-1.5">
+                    {order.isEmergency && (
+                      <span className="badge badge--danger text-[10px] font-bold">
+                        <AlertTriangle className="w-3 h-3" />
+                        Urgent
+                      </span>
+                    )}
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border" style={{ background: 'var(--surface-secondary)', borderColor: 'var(--border-subtle)', color: 'var(--text-tertiary)' }}>
+                      {order.hospitalId || 'Facility N/A'}
                     </span>
                   </div>
-                )}
+                  <span className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>
+                    {order.timeSlot || 'OPD'}
+                  </span>
+                </div>
 
                 <div className="mb-3">
                   <div className="flex items-center justify-between mb-2">

@@ -24,6 +24,7 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
   const [currentStatus, setCurrentStatus] = useState("Active");
   const [queueSearch, setQueueSearch] = useState("");
   const consultationRef = useRef(null);
+  const [completedToast, setCompletedToast] = useState("");
 
   const medicinePresets = [
     "Tab. Paracetamol 650mg (1-0-1 PC)",
@@ -164,34 +165,57 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
   // 4. Complete Consultation & Send to Pharmacy
   const handleComplete = async (sendToPharmacy = true) => {
     if (!currentPatient) return;
+    const patientName = currentPatient.patientName || "Patient";
+    const tokenNumber = currentPatient.tokenNumber || "";
+    const pId = currentPatient.id;
+
     try {
       const ocrPrescription = getPatientOcrText(currentPatient);
       const finalPrescription = prescriptionText.trim() 
         || ocrPrescription 
         || (sendToPharmacy ? "Consultation Completed — Routine Dispensation / Advice" : "");
 
-      await updateDoc(doc(db, 'appointments', currentPatient.id), { 
+      const updateData = { 
         status: 'Completed',
         prescription: finalPrescription, 
         pharmacyStatus: sendToPharmacy ? 'Pending' : 'Skipped',
-        completedAt: new Date().toISOString(),
-        sentToPharmacyAt: sendToPharmacy ? new Date().toISOString() : null,
-        hospitalId: currentPatient.hospitalId || hospitalId
-      });
+        completedAt: new Date().toISOString()
+      };
+
+      if (sendToPharmacy) {
+        updateData.sentToPharmacyAt = new Date().toISOString();
+      }
+
+      const hospToSave = currentPatient.hospitalId || hospitalId;
+      if (hospToSave) {
+        updateData.hospitalId = hospToSave;
+      }
+
+      await updateDoc(doc(db, 'appointments', pId), updateData);
       
-      // Reset doctor status
-      await handleStatusChange("Active");
-      await setDoc(doc(db, 'queue', hospitalId), {
-        activeDoctor: doctorName,
-        status: 'Available',
-        lastUpdated: new Date()
-      }, { merge: true });
+      // Reset doctor status safely
+      if (doctorName) {
+        await handleStatusChange("Active").catch(e => console.warn(e));
+      }
+      if (hospToSave) {
+        await setDoc(doc(db, 'queue', hospToSave), {
+          activeDoctor: doctorName || 'Doctor',
+          status: 'Available',
+          lastUpdated: new Date()
+        }, { merge: true }).catch(e => console.warn(e));
+      }
       
       setCurrentPatient(null);
       setPrescriptionText("");
+      setCompletedToast(
+        sendToPharmacy 
+          ? `Dispatched prescription for ${patientName} (${tokenNumber}) to Pharmacy!`
+          : `Consultation completed for ${patientName} (${tokenNumber}).`
+      );
+      setTimeout(() => setCompletedToast(""), 6000);
     } catch (err) {
       console.error("Error completing consultation:", err);
-      alert("Failed to send prescription to Pharmacy. Please check connection and try again.");
+      alert("Error completing consultation: " + (err.message || err));
     }
   };
 
@@ -403,6 +427,13 @@ export default function DoctorPanel({ hospitalId, doctorName }) {
             </span>
           )}
         </h2>
+
+        {completedToast && (
+          <div className="mb-4 p-3 rounded-md border text-xs font-semibold flex items-center gap-2 animate-fadeIn" style={{ background: 'var(--positive-50)', borderColor: 'var(--positive-100)', color: 'var(--positive-600)' }}>
+            <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+            <span>{completedToast}</span>
+          </div>
+        )}
 
         {currentPatient ? (
           <div className="flex-1 flex flex-col">
